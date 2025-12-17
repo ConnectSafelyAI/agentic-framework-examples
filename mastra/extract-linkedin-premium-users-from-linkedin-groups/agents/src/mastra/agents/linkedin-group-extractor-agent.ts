@@ -1,7 +1,6 @@
 import { Agent } from "@mastra/core/agent";
 import { Memory } from "@mastra/memory";
 import { LibSQLStore } from "@mastra/libsql";
-import { scorers } from "../scorers/weather-scorer";
 import {
   premiumMembersTool,
   fetchAllGroupMembersTool,
@@ -12,7 +11,7 @@ import {
   createGoogleSheetTool,
   addDataToGoogleSheetTool,
   createSheetAndAddMembersTool,
-} from "../tools/premiumMembers-tool";
+} from "../tools/linkedin-group-extractor-tools";
 
 export const premiumMembersAgent = new Agent({
   name: "Premium members Agent",
@@ -71,29 +70,6 @@ Be conversational but efficient. Focus on getting results and completing the ful
     createGoogleSheetTool,
     addDataToGoogleSheetTool,
     createSheetAndAddMembersTool,
-  },
-  scorers: {
-    toolCallAppropriateness: {
-      scorer: scorers.toolCallAppropriatenessScorer,
-      sampling: {
-        type: "ratio",
-        rate: 1,
-      },
-    },
-    completeness: {
-      scorer: scorers.completenessScorer,
-      sampling: {
-        type: "ratio",
-        rate: 1,
-      },
-    },
-    translation: {
-      scorer: scorers.translationScorer,
-      sampling: {
-        type: "ratio",
-        rate: 1,
-      },
-    },
   },
   memory: new Memory({
     storage: new LibSQLStore({
