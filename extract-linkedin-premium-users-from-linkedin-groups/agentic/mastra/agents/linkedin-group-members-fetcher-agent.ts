@@ -7,7 +7,7 @@ import {
   fetchGroupMembersByUrlTool,
   completeGroupMembersWorkflowTool,
   filterPremiumVerifiedMembersTool,
-} from "../tools/Linkedin-premium-members";
+} from "../tools/linkedin";
 import { googleSheetsTool } from "../tools/googlesheet";
 
 export const premiumMembersAgent = new Agent({

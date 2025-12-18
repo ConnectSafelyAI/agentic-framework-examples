@@ -1,1 +1,1 @@
-export { googleSheetsTool } from "./googlesheet-tool";
+export { googleSheetsTool } from "./google-sheet";
