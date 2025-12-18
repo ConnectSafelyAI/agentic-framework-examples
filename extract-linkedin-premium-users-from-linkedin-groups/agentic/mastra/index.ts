@@ -1,7 +1,7 @@
 import { Mastra } from "@mastra/core/mastra";
 import { PinoLogger } from "@mastra/loggers";
 import { LibSQLStore } from "@mastra/libsql";
-import { premiumMembersAgent } from "./agents/linkedin-group-extractor-agent";
+import { premiumMembersAgent } from "./agents/linkedin-group-members-fetcher-agent";
 
 export const mastra = new Mastra({
   agents: { premiumMembersAgent },

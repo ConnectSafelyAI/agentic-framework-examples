@@ -2,16 +2,13 @@ import { Agent } from "@mastra/core/agent";
 import { Memory } from "@mastra/memory";
 import { LibSQLStore } from "@mastra/libsql";
 import {
-  premiumMembersTool,
-  fetchAllGroupMembersTool,
-  filterPremiumVerifiedMembersTool,
-  exportToGoogleSheetsTool,
+  fetchLinkedInPremiumGroupMembersTool,
+  fetchAllLinkedInGroupMembersTool,
+  fetchGroupMembersByUrlTool,
   completeGroupMembersWorkflowTool,
-  getGroupMembersByUrlTool,
-  createGoogleSheetTool,
-  addDataToGoogleSheetTool,
-  createSheetAndAddMembersTool,
-} from "../tools/linkedin-group-extractor-tools";
+  filterPremiumVerifiedMembersTool,
+} from "../tools/Linkedin-premium-members";
+import { googleSheetsTool } from "../tools/googlesheet";
 
 export const premiumMembersAgent = new Agent({
   name: "Premium members Agent",
@@ -22,12 +19,9 @@ Your available tools:
 1. **premiumMembersTool** (fetch-linkedin-group-members) - Fetch members from a LinkedIn group with pagination
 2. **fetchAllGroupMembersTool** (fetch-all-linkedin-group-members) - Fetch ALL members automatically handling pagination
 3. **filterPremiumVerifiedMembersTool** (filter-premium-verified-members) - Filter members to only include Premium/Verified profiles
-4. **exportToGoogleSheetsTool** (export-members-to-google-sheets) - Export members to an existing Google Sheet
-5. **completeGroupMembersWorkflowTool** (complete-group-members-workflow) - Complete workflow: fetch, filter, and export in one operation
-6. **getGroupMembersByUrlTool** (get-group-members-by-url) - Fetch members using group URL instead of ID
-7. **createGoogleSheetTool** (create-google-sheet) - Create a new Google Spreadsheet with headers
-8. **addDataToGoogleSheetTool** (add-data-to-google-sheet) - Add rows of data to an existing Google Sheet
-9. **createSheetAndAddMembersTool** (create-sheet-and-add-members) - Complete workflow: Create sheet and add members in one operation
+4. **completeGroupMembersWorkflowTool** (complete-group-members-workflow) - Complete workflow: fetch, filter, and export to existing Google Sheet
+5. **getGroupMembersByUrlTool** (get-group-members-by-url) - Fetch members using group URL instead of ID
+6. **googleSheetsTool** (google-sheets-members) - Unified Google Sheets tool: Create new spreadsheet OR add members to existing sheet (handles both scenarios)
 
 Guidelines:
 1. ALWAYS think step-by-step before using tools
@@ -42,14 +36,15 @@ Recommended workflows:
 
 **For "Extract 100 premium members from group X and add to Google Sheet":**
 Option A (Complete workflow - RECOMMENDED):
-1. Use createSheetAndAddMembersTool - This creates a new sheet and adds all members in one operation
-   - Requires: accessToken, spreadsheetTitle, sheetName, members array
+1. Use googleSheetsTool - This unified tool can create a new sheet OR add to existing sheet
+   - For new sheet: Provide spreadsheetTitle, sheetName, members array
+   - For existing sheet: Provide spreadsheetId, sheetName, members array
+   - Access token can be provided or set via GOOGLE_ACCESS_TOKEN env var
 
 Option B (Step-by-step):
 1. Use fetchAllGroupMembersTool to get all members (with maxMembers: 100)
 2. Use filterPremiumVerifiedMembersTool to filter for premium/verified
-3. Use createGoogleSheetTool to create a new spreadsheet
-4. Use addDataToGoogleSheetTool to add the filtered members
+3. Use googleSheetsTool to create new spreadsheet or add to existing one
 
 **Important:**
 - Always ask for the Google OAuth2 accessToken if not provided
@@ -61,15 +56,12 @@ Be conversational but efficient. Focus on getting results and completing the ful
 `,
   model: "google/gemini-2.5-flash",
   tools: {
-    premiumMembersTool,
-    fetchAllGroupMembersTool,
+    fetchLinkedInPremiumGroupMembersTool,
+    fetchAllLinkedInGroupMembersTool,
     filterPremiumVerifiedMembersTool,
-    exportToGoogleSheetsTool,
     completeGroupMembersWorkflowTool,
-    getGroupMembersByUrlTool,
-    createGoogleSheetTool,
-    addDataToGoogleSheetTool,
-    createSheetAndAddMembersTool,
+    fetchGroupMembersByUrlTool,
+    googleSheetsTool,
   },
   memory: new Memory({
     storage: new LibSQLStore({
