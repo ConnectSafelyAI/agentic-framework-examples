@@ -1,101 +1,72 @@
+/// <reference types="node" />
 import { createTool } from "@mastra/core/tools";
 import { z } from "zod";
-import type { GroupMember, GroupMembersResponse } from "./types";
-
-// ============================================================================
-// TOOL: FETCH ALL LINKEDIN GROUP MEMBERS (automatic pagination)
-// ============================================================================
-// Automatically fetches ALL members from a LinkedIn group by handling pagination internally.
-// Continues fetching until all members are retrieved or a maximum limit is reached.
+import { LinkedInMember } from "./index";
 
 export const fetchAllLinkedInGroupMembersTool = createTool({
   id: "fetch-all-linkedin-group-members",
-  description:
-    "Fetch ALL members from a LinkedIn group by automatically handling pagination. Will continue fetching until all members are retrieved.",
+  description: "Fetch all LinkedIn group members with auto pagination",
+
   inputSchema: z.object({
-    apiToken: z.string().describe("ConnectSafely.ai API bearer token"),
-    groupId: z.string().describe("LinkedIn group ID"),
-    batchSize: z
-      .number()
-      .min(1)
-      .max(100)
-      .default(50)
-      .describe("Members per API request"),
-    maxMembers: z
-      .number()
-      .optional()
-      .describe("Maximum members to fetch (optional limit)"),
+    groupId: z.string(),
+    maxMembers: z.number().optional(),
   }),
+
   outputSchema: z.object({
-    allMembers: z.array(
-      z.object({
-        profileId: z.string(),
-        firstName: z.string(),
-        lastName: z.string(),
-        fullName: z.string(),
-        headline: z.string(),
-        publicIdentifier: z.string(),
-        profileUrl: z.string(),
-        followerCount: z.number(),
-        isPremium: z.boolean(),
-        isVerified: z.boolean(),
-        badges: z.array(z.string()),
-        relationshipStatus: z.string(),
-        creator: z.boolean(),
-      })
-    ),
     totalFetched: z.number(),
-    requestsMade: z.number(),
+    members: z.array(z.any()),
   }),
+
   execute: async ({ context }) => {
-    const allMembers: GroupMember[] = [];
     let start = 0;
+    const count = 50;
     let hasMore = true;
-    let requestsMade = 0;
+
+    const allMembers: LinkedInMember[] = [];
 
     while (hasMore) {
-      // Check if we've hit the max limit
-      if (context.maxMembers && allMembers.length >= context.maxMembers) {
-        break;
-      }
-
-      const response = await fetch(
+      const res = await fetch(
         "https://api.connectsafely.ai/linkedin/groups/members",
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${context.apiToken}`,
+            Authorization: `Bearer ${process.env.CONNECTSAFELY_API_TOKEN}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
             groupId: context.groupId,
-            count: context.batchSize,
-            start: start,
+            start,
+            count,
           }),
         }
       );
 
-      if (!response.ok) {
-        throw new Error(
-          `Failed to fetch group members: ${response.statusText}`
-        );
+      if (!res.ok) {
+        throw new Error("Pagination fetch failed");
       }
 
-      const data = (await response.json()) as GroupMembersResponse;
-      allMembers.push(...data.members);
-      hasMore = data.hasMore;
-      start += context.batchSize;
-      requestsMade++;
+      const data = await res.json();
 
-      // Add a small delay to avoid rate limiting
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      const batch = (data.members || []).map((m: any) => ({
+        ...m,
+        fetchedAt: new Date().toISOString(),
+      }));
+
+      allMembers.push(...batch);
+
+      hasMore = Boolean(data.hasMore);
+      start += count;
+
+      if (context.maxMembers && allMembers.length >= context.maxMembers) {
+        break;
+      }
     }
 
     return {
-      allMembers,
       totalFetched: allMembers.length,
-      requestsMade,
+      members: context.maxMembers
+        ? allMembers.slice(0, context.maxMembers)
+        : allMembers,
     };
   },
 });
-
