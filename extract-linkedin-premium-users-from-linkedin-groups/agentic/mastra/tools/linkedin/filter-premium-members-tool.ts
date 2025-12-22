@@ -1,6 +1,6 @@
 import { createTool } from "@mastra/core/tools";
 import { z } from "zod";
-import { LinkedInMember } from "./index";
+import { LinkedInMember } from "./types.js";
 
 export const filterPremiumVerifiedMembersTool = createTool({
   id: "filter-premium-verified-members",

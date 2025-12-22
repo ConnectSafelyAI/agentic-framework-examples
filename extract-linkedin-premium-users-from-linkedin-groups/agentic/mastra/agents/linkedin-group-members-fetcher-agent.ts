@@ -8,12 +8,12 @@ import {
   fetchGroupMembersByUrlTool,
   filterPremiumVerifiedMembersTool,
   completeGroupMembersWorkflowTool,
-} from "../tools/linkedin";
+} from "../tools/linkedin/index.js";
 
-import { googleSheetsTool } from "../tools/googlesheet";
+import { googleSheetsTool } from "../tools/googlesheet/index.js";
 
-export const LinkedIn_Group_Premium_Member_Extractor_Agent = new Agent({
-  name: "LinkedIn Premium Members Agent",
+export const premiumMembersAgent = new Agent({
+  name: "LinkedIn Group Premium Member Extractor",
 
   model: "google/gemini-2.5-flash",
 

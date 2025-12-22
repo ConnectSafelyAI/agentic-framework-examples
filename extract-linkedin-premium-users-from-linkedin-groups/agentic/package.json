@@ -1,17 +1,22 @@
 {
   "name": "linkedin-premium-members",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "LinkedIn Group Premium Member Extractor Agent",
+  "main": "dist/agent.js",
+  "type": "module",
+  "bin": {
+    "linkedin-premium-extractor": "./dist/agent.js"
+  },
   "scripts": {
     "dev": "mastra dev --dir mastra",
-    "build": "mastra build --dir mastra",
-    "start": "mastra start --dir mastra"
+    "build": "tsc && chmod +x dist/agent.js",
+    "start": "node dist/agent.js",
+    "cli": "node dist/agent.js",
+    "prepublishOnly": "npm run build"
   },
-  "keywords": [],
+  "keywords": ["linkedin", "agent", "premium-members"],
   "author": "",
   "license": "ISC",
-  "type": "module",
   "engines": {
     "node": ">=22.13.0"
   },
@@ -27,6 +32,7 @@
   "devDependencies": {
     "@types/node": "^25.0.2",
     "mastra": "^0.18.8",
+    "tsx": "^4.7.0",
     "typescript": "^5.9.3"
   }
 }

@@ -36,7 +36,7 @@ export const fetchGroupMembersByUrlTool = createTool({
       throw new Error("Failed to resolve LinkedIn group URL");
     }
 
-    const data = await res.json();
+    const data = (await res.json()) as { groupId?: string };
 
     if (!data.groupId) {
       throw new Error("groupId not found for provided URL");

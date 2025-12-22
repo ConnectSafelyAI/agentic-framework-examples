@@ -1,7 +1,7 @@
 /// <reference types="node" />
 import { createTool } from "@mastra/core/tools";
 import { z } from "zod";
-import { LinkedInMember } from "./index";
+import { LinkedInMember } from "./types.js";
 
 export const fetchAllLinkedInGroupMembersTool = createTool({
   id: "fetch-all-linkedin-group-members",
@@ -45,7 +45,7 @@ export const fetchAllLinkedInGroupMembersTool = createTool({
         throw new Error("Pagination fetch failed");
       }
 
-      const data = await res.json();
+      const data = (await res.json()) as { members?: any[]; hasMore?: boolean };
 
       const batch = (data.members || []).map((m: any) => ({
         ...m,

@@ -1,7 +1,7 @@
 /// <reference types="node" />
 import { createTool } from "@mastra/core/tools";
 import { z } from "zod";
-import { LinkedInMember } from "./index";
+import { LinkedInMember } from "./types.js";
 
 export const fetchLinkedInGroupMembersTool = createTool({
   id: "fetch-linkedin-group-members",
@@ -38,10 +38,10 @@ export const fetchLinkedInGroupMembersTool = createTool({
       throw new Error("Failed to fetch LinkedIn group members");
     }
 
-    const data = await res.json();
+    const data = (await res.json()) as { members?: LinkedInMember[]; hasMore?: boolean };
 
     return {
-      members: data.members as LinkedInMember[],
+      members: (data.members || []) as LinkedInMember[],
       hasMore: Boolean(data.hasMore),
       fetched: data.members?.length ?? 0,
     };

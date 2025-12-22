@@ -18,7 +18,7 @@ async function getAccessToken() {
     throw new Error("Failed to refresh Google access token");
   }
 
-  const data = await res.json();
+  const data = (await res.json()) as { access_token: string };
   return data.access_token;
 }
 
@@ -86,11 +86,6 @@ export const googleSheetsTool = createTool({
     if (!accessToken) {
       throw new Error("Google access token is required. Please ensure GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GOOGLE_REFRESH_TOKEN are set in environment variables.");
     }
-console.log("accessToken", accessToken);
-
-    if (!accessToken) {
-      throw new Error("Google access token is required");
-    }
 
     // ---------------------------------------------------------------------
     // Auto-generate spreadsheet title if missing
@@ -156,7 +151,7 @@ console.log("accessToken", accessToken);
         throw new Error(`Failed to create spreadsheet: ${err}`);
       }
 
-      const data = await createRes.json();
+      const data = (await createRes.json()) as { spreadsheetId: string; spreadsheetUrl: string };
       spreadsheetId = data.spreadsheetId;
       spreadsheetUrl = data.spreadsheetUrl;
       isNewSheet = true;
@@ -191,7 +186,8 @@ console.log("accessToken", accessToken);
       throw new Error("Failed to read spreadsheet");
     }
 
-    const sheetValues = (await readRes.json()).values || [];
+    const sheetData = (await readRes.json()) as { values?: any[][] };
+    const sheetValues = sheetData.values || [];
     const existingProfileIds = new Set<string>();
 
     sheetValues.slice(1).forEach((row: any[]) => {
@@ -247,6 +243,10 @@ console.log("accessToken", accessToken);
     // ---------------------------------------------------------------------
     // Final response
     // ---------------------------------------------------------------------
+    if (!spreadsheetId) {
+      throw new Error("Spreadsheet ID is required but was not created or provided");
+    }
+
     return {
       success: true,
       spreadsheetId,

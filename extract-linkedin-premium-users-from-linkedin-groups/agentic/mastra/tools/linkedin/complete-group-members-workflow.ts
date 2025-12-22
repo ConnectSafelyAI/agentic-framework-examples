@@ -65,7 +65,7 @@ export const completeGroupMembersWorkflowTool = createTool({
         throw new Error("Failed to fetch LinkedIn group members");
       }
 
-      const data = await res.json();
+      const data = (await res.json()) as { members?: any[]; hasMore?: boolean };
       const members = data.members || [];
 
       for (const member of members) {
