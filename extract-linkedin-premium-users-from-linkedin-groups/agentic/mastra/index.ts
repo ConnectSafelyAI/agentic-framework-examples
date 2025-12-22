@@ -1,10 +1,10 @@
 import { Mastra } from "@mastra/core/mastra";
 import { PinoLogger } from "@mastra/loggers";
 import { LibSQLStore } from "@mastra/libsql";
-import { premiumMembersAgent } from "./agents/linkedin-group-members-fetcher-agent";
+import { LinkedIn_Group_Premium_Member_Extractor_Agent } from "./agents/linkedin-group-members-fetcher-agent";
 
 export const mastra = new Mastra({
-  agents: { premiumMembersAgent },
+  agents: { LinkedIn_Group_Premium_Member_Extractor_Agent },
   storage: new LibSQLStore({
     // stores observability, scores, ... into memory storage, if it needs to persist, change to file:../mastra.db
     url: ":memory:",

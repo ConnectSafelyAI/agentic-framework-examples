@@ -12,7 +12,7 @@ import {
 
 import { googleSheetsTool } from "../tools/googlesheet";
 
-export const premiumMembersAgent = new Agent({
+export const LinkedIn_Group_Premium_Member_Extractor_Agent = new Agent({
   name: "LinkedIn Premium Members Agent",
 
   model: "google/gemini-2.5-flash",
