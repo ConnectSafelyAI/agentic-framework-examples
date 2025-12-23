@@ -8,7 +8,7 @@
     "linkedin-premium-extractor": "./dist/agent.js"
   },
   "scripts": {
-    "dev": "mastra dev --dir mastra",
+    "dev": "mastra dev",
     "build": "tsc && chmod +x dist/agent.js",
     "start": "node dist/agent.js",
     "cli": "node dist/agent.js",

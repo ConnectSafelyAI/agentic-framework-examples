@@ -188,7 +188,7 @@ The agent has access to 6 specialized tools:
 1. **Clone and navigate to the project**:
 
    ```bash
-   cd extract-linkedin-premium-users-from-linkedin-groups/agentic
+   cd extract-linkedin-premium-users-from-linkedin-groups/agentic/mastra
    ```
 
 2. **Install dependencies**:
@@ -527,27 +527,28 @@ Returns: Premium/Verified members
 ```
 extract-linkedin-premium-users-from-linkedin-groups/
 └── agentic/
-    ├── agent.ts                          # CLI entry point
-    ├── package.json                      # Dependencies and scripts
-    ├── tsconfig.json                     # TypeScript configuration
-    ├── .env                              # Environment variables (create this)
-    ├── dist/                             # Compiled JavaScript (after build)
     └── mastra/
+        ├── agent.ts                      # CLI entry point
+        ├── package.json                  # Dependencies and scripts
+        ├── tsconfig.json                 # TypeScript configuration
+        ├── README.md                     # This file
+        ├── .env                          # Environment variables (create this)
+        ├── dist/                         # Compiled JavaScript (after build)
         ├── index.ts                      # Mastra configuration
         ├── agents/
         │   └── linkedin-group-members-fetcher-agent.ts  # Agent definition
         └── tools/
             ├── linkedin/
             │   ├── index.ts              # Tool exports
-            │   ├── types.ts               # TypeScript types
+            │   ├── types.ts              # TypeScript types
             │   ├── complete-group-members-workflow.ts    # Main workflow tool
             │   ├── fetch-all-linkedin-group-members.ts   # Fetch all tool
             │   ├── fetch-linkedIn-group-members-tool.ts   # Single batch tool
             │   ├── fetch-group-members-by-url.ts         # URL resolver tool
-            │   └── filter-premium-members-tool.ts       # Filter tool
+            │   └── filter-premium-members-tool.ts        # Filter tool
             └── googlesheet/
                 ├── index.ts
-                └── google-sheet.ts        # Google Sheets integration
+                └── google-sheet.ts       # Google Sheets integration
 ```
 
 ---

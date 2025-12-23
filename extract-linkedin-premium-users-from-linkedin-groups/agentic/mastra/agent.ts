@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import "dotenv/config";
 import readline from "readline";
-import { premiumMembersAgent } from "./mastra/agents/linkedin-group-members-fetcher-agent.js";
+import { premiumMembersAgent } from "./agents/linkedin-group-members-fetcher-agent.js";
 
 // Check if command-line argument is provided (non-interactive mode)
 const args = process.argv.slice(2);
