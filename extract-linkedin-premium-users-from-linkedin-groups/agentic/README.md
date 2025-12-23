@@ -1,14 +1,14 @@
-# Extract Premium & Verified LinkedIn Group Members
+# LinkedIn Group Premium Member Extractor
 
-An agentic framework example built with [Mastra](https://mastra.ai) that automates the extraction of Premium and Verified LinkedIn group members using the [ConnectSafely.ai](https://connectsafely.ai) API. This project enables sales professionals, community managers, recruiters, and growth marketers to identify high-quality leads from LinkedIn groups without manual effort.
+An intelligent AI agent built with [Mastra](https://mastra.ai) that automates the extraction of Premium and Verified LinkedIn group members using the [ConnectSafely.ai](https://connectsafely.ai) API. This agent enables sales professionals, community managers, recruiters, and growth marketers to identify high-quality leads from LinkedIn groups without manual effort.
 
-## Purpose
+## 🎯 Purpose
 
-This project provides an intelligent agent that can:
+This project provides an **AI-powered agent** that can:
 
-- **Extract LinkedIn Group Members**: Fetch members from any LinkedIn group you're a member of
+- **Extract LinkedIn Group Members**: Fetch members from any LinkedIn group you're a member of via ConnectSafely.ai API
 - **Filter Premium & Verified Profiles**: Automatically identify decision-makers, founders, and verified professionals
-- **Handle Pagination**: Process groups of any size (from 500 to 50,000+ members)
+- **Handle Pagination Automatically**: Process groups of any size (from 500 to 50,000+ members) with intelligent pagination
 - **Export to Google Sheets**: Seamlessly export filtered member data to Google Spreadsheets
 - **Complete Workflows**: Execute end-to-end automation from extraction to export in a single operation
 
@@ -21,39 +21,51 @@ This project provides an intelligent agent that can:
 - **Event Marketing**: Identify engaged professionals in niche communities for webinar and conference promotion
 - **Content Strategy**: Research headlines and titles to understand what resonates in your industry
 
-## ConnectSafely.ai Configuration
+---
 
-This project uses the [ConnectSafely.ai API](https://connectsafely.ai/docs) to interact with LinkedIn groups. The configuration details are as follows:
+## 🔌 ConnectSafely.ai Integration
 
-### API Endpoint
+This agent is built entirely on top of the **ConnectSafely.ai API**, which provides secure and reliable access to LinkedIn group data. ConnectSafely.ai handles all the complexity of LinkedIn API interactions, authentication, and data normalization.
 
-The project makes requests to the ConnectSafely.ai LinkedIn Groups API:
+### Why ConnectSafely.ai?
+
+ConnectSafely.ai is a specialized platform that:
+- **Simplifies LinkedIn Automation**: No need to manage LinkedIn API credentials directly
+- **Provides Reliable Access**: Handles rate limiting, authentication, and API changes automatically
+- **Ensures Data Quality**: Returns normalized, structured data with Premium/Verified status indicators
+- **Scales Efficiently**: Built to handle large-scale member extraction from LinkedIn groups
+
+### ConnectSafely.ai API Overview
+
+#### API Endpoint
+
+All member extraction requests are made to:
 
 ```
 POST https://api.connectsafely.ai/linkedin/groups/members
 ```
 
-### Authentication
+#### Authentication
 
-ConnectSafely.ai uses **Bearer Token Authentication**. All API requests require an authorization header with your API key:
+ConnectSafely.ai uses **Bearer Token Authentication**. The agent automatically includes your API token in all requests:
 
 ```typescript
 headers: {
-  Authorization: `Bearer ${apiToken}`,
+  Authorization: `Bearer ${process.env.CONNECTSAFELY_API_TOKEN}`,
   "Content-Type": "application/json",
 }
 ```
 
-### Obtaining Your API Key
+#### Obtaining Your ConnectSafely.ai API Key
 
-1. Log into the [ConnectSafely.ai Dashboard](https://connectsafely.ai)
-2. Navigate to **Settings** → **API Keys**
+1. Sign up at [ConnectSafely.ai](https://connectsafely.ai)
+2. Navigate to **Settings** → **API Keys** in your dashboard
 3. Generate a new API key
-4. Copy the API key (you'll need it when running the agent)
+4. Add it to your `.env` file as `CONNECTSAFELY_API_TOKEN`
 
-### API Request Format
+#### API Request Format
 
-The API accepts the following request body:
+The agent sends requests in this format:
 
 ```json
 {
@@ -64,14 +76,13 @@ The API accepts the following request body:
 ```
 
 **Parameters:**
-
 - `groupId` (string, required): LinkedIn group ID (found in the group URL: `linkedin.com/groups/XXXXXXX/`)
 - `count` (number, optional): Number of members per request (1-100, default: 50)
 - `start` (number, optional): Pagination offset - starting position (default: 0)
 
-### API Response Format
+#### API Response Format
 
-The API returns member data with the following structure:
+ConnectSafely.ai returns structured member data:
 
 ```typescript
 {
@@ -85,47 +96,99 @@ The API returns member data with the following structure:
       publicIdentifier: string;
       profileUrl: string;
       followerCount: number;
-      isPremium: boolean;
-      isVerified: boolean;
-      badges: string[];
+      isPremium: boolean;        // Premium subscription indicator
+      isVerified: boolean;       // Verified profile indicator
+      badges: string[];          // Array of badges (e.g., ["premium", "verified"])
       relationshipStatus: string;
       creator: boolean;
     }
   ],
-  hasMore: boolean;
+  hasMore: boolean;              // Indicates if more members are available
 }
 ```
 
-### Features Used
+#### ConnectSafely.ai Features Used
 
-The project leverages the following ConnectSafely.ai API capabilities:
+The agent leverages these ConnectSafely.ai capabilities:
 
-1. **Group Member Extraction**: Fetches member profiles from LinkedIn groups
-2. **Pagination Support**: Handles large groups with automatic pagination
-3. **Premium/Verified Status**: Identifies Premium subscribers and verified profiles
+1. **Group Member Extraction**: Fetches member profiles from LinkedIn groups you're a member of
+2. **Pagination Support**: Handles large groups with automatic pagination via `hasMore` flag
+3. **Premium/Verified Status**: Identifies Premium subscribers and verified profiles via `isPremium`, `isVerified`, and `badges` fields
 4. **Profile Metadata**: Retrieves comprehensive profile information including headlines, follower counts, and relationship status
+5. **Reliable Data Structure**: Consistent, normalized data format across all responses
 
-### Rate Limits & Best Practices
+#### Rate Limits & Best Practices
 
 - Maximum `count` per request: **100 members**
 - The API handles pagination automatically via the `hasMore` flag
-- Ensure you're a member of the target LinkedIn group (API can only access groups you've joined)
+- **Important**: You must be a member of the target LinkedIn group (ConnectSafely.ai can only access groups you've joined)
 - For large groups, the agent automatically handles pagination to fetch all members
+- The agent uses a batch size of 50 members per request for optimal performance
 
-## Setup Instructions
+---
+
+## 🤖 How the Agent Works
+
+The **LinkedIn Group Premium Member Extractor** is an AI agent powered by Google's Gemini 2.5 Flash model. It uses a set of specialized tools to interact with the ConnectSafely.ai API and Google Sheets.
+
+### Agent Architecture
+
+```
+User Query
+    ↓
+AI Agent (Gemini 2.5 Flash)
+    ↓
+Tool Selection & Execution
+    ↓
+ConnectSafely.ai API → LinkedIn Groups
+    ↓
+Data Processing & Filtering
+    ↓
+Google Sheets (Optional)
+    ↓
+Response to User
+```
+
+### Agent Capabilities
+
+The agent can:
+- **Understand natural language queries** (e.g., "fetch 10 premium members from group 9357376")
+- **Automatically select the right tools** for the task
+- **Handle pagination** without manual intervention
+- **Filter for Premium/Verified members** intelligently
+- **Export to Google Sheets** when requested
+- **Remember context** across multiple interactions
+
+### Available Tools
+
+The agent has access to 6 specialized tools:
+
+1. **`fetchLinkedInGroupMembersTool`** - Fetch a single paginated batch (low-level control)
+2. **`fetchAllLinkedInGroupMembersTool`** - Fetch ALL members with automatic pagination
+3. **`fetchGroupMembersByUrlTool`** - Resolve LinkedIn group URL to groupId
+4. **`filterPremiumVerifiedMembersTool`** - Filter members for Premium/Verified profiles
+5. **`completeGroupMembersWorkflowTool`** - End-to-end: fetch + filter Premium/Verified members
+6. **`googleSheetsTool`** - Create or update Google Sheets with member data
+
+---
+
+## 🛠️ Setup Instructions
 
 ### Prerequisites
 
-- Node.js >= 22.13.0
-- ConnectSafely.ai API key
-- Google OAuth2 access token (for Google Sheets export)
+- **Node.js** >= 22.13.0
+- **ConnectSafely.ai API Key** - Get yours at [connectsafely.ai](https://connectsafely.ai)
+- **Google OAuth Credentials** (optional, for Google Sheets export):
+  - `GOOGLE_CLIENT_ID`
+  - `GOOGLE_CLIENT_SECRET`
+  - `GOOGLE_REFRESH_TOKEN`
 
 ### Installation
 
-1. **Clone the repository** (if not already done):
+1. **Clone and navigate to the project**:
 
    ```bash
-   cd mastra/extract-linkedin-premium-users-from-linkedin-groups/agents
+   cd extract-linkedin-premium-users-from-linkedin-groups/agentic
    ```
 
 2. **Install dependencies**:
@@ -134,276 +197,252 @@ The project leverages the following ConnectSafely.ai API capabilities:
    npm install
    ```
 
-3. **Configure your API credentials**:
-   - You'll need to provide your ConnectSafely.ai API token when running the agent
-   - For Google Sheets export, you'll need a Google OAuth2 access token
+3. **Configure environment variables**:
 
-### Running the Agent
+   Create a `.env` file in the project root:
 
-1. **Start the Mastra development server**:
+   ```env
+   # ConnectSafely.ai API Token (Required)
+   CONNECTSAFELY_API_TOKEN=your_connectsafely_api_token_here
 
-   ```bash
-   npm run dev
+   # Google OAuth (Optional, for Google Sheets)
+   GOOGLE_CLIENT_ID=your_google_client_id
+   GOOGLE_CLIENT_SECRET=your_google_client_secret
+   GOOGLE_REFRESH_TOKEN=your_google_refresh_token
    ```
 
-2. **Interact with the agent**:
-   - The agent will prompt you for your ConnectSafely.ai API token if not provided
-   - Provide the LinkedIn group ID or URL you want to extract members from
-   - The agent will automatically filter for Premium and Verified members
-   - Optionally export results to Google Sheets
+### Building for Production
 
-## Available Tools
+Build the TypeScript code to JavaScript:
 
-The agent provides 9 powerful tools for LinkedIn group member extraction and Google Sheets management. Each tool is designed for specific use cases and can be used independently or combined for complex workflows.
+```bash
+npm run build
+```
 
-### 1. Fetch LinkedIn Group Members (`fetch-linkedin-group-members`)
+This compiles all TypeScript files to the `dist/` directory.
 
-**Purpose**: Fetch members from a LinkedIn group with manual pagination support. Use this tool when you need fine-grained control over pagination or want to fetch a specific subset of members.
+---
+
+## 🚀 Usage
+
+### Development Mode
+
+For development and testing:
+
+```bash
+# Interactive mode
+npx tsx agent.ts
+
+# Non-interactive mode (one command)
+npx tsx agent.ts "fetch 10 premium members from group 9357376"
+```
+
+### Production Mode
+
+After building:
+
+```bash
+# Interactive mode (REPL)
+npm start
+# or
+./dist/agent.js
+
+# Non-interactive mode (one command)
+npm start -- "fetch 10 premium members from group 9357376"
+# or
+./dist/agent.js "fetch 10 premium members from group 9357376"
+```
+
+### Example Queries
+
+The agent understands natural language queries:
+
+```
+> fetch 10 premium members from group 9357376
+> get all verified members from group 9357376 and save to Google Sheets
+> extract premium members from https://www.linkedin.com/groups/9357376/
+> fetch 50 members from group 9357376 and add them to a new spreadsheet
+```
+
+---
+
+## 📋 Available Tools
+
+### 1. Complete Group Members Workflow (`complete-group-members-workflow`)
+
+**Purpose**: End-to-end workflow that fetches all LinkedIn group members via ConnectSafely.ai API and returns only Premium or Verified profiles. This is the **recommended tool** for most use cases.
+
+**How it works with ConnectSafely.ai**:
+- Makes multiple API calls to `https://api.connectsafely.ai/linkedin/groups/members`
+- Handles pagination automatically using the `hasMore` flag from ConnectSafely.ai responses
+- Filters members in real-time as they're fetched
+- Uses `CONNECTSAFELY_API_TOKEN` from environment variables
 
 **Input Parameters**:
-- `apiToken` (string, required): ConnectSafely.ai API bearer token
-- `groupId` (string, required): LinkedIn group ID (e.g., "9357376")
-- `count` (number, optional): Number of members per request (1-100, default: 50)
-- `start` (number, optional): Pagination offset - starting position (default: 0)
+- `groupId` (string, required): LinkedIn group ID
+- `maxMembers` (number, optional): Limit on number of members to fetch
 
 **Output**:
 ```typescript
 {
+  groupId: string;
+  totalFetched: number;
+  totalPremiumVerified: number;
   members: Array<{
     profileId: string;
-    firstName: string;
-    lastName: string;
-    fullName: string;
-    headline: string;
-    publicIdentifier: string;
-    profileUrl: string;
-    followerCount: number;
-    isPremium: boolean;
-    isVerified: boolean;
-    badges: string[];
-    relationshipStatus: string;
-    creator: boolean;
+    firstName?: string;
+    lastName?: string;
+    fullName?: string;
+    headline?: string;
+    publicIdentifier?: string;
+    profileUrl?: string;
+    followerCount?: number;
+    isPremium?: boolean;
+    isVerified?: boolean;
+    badges?: string[];
+    relationshipStatus?: string;
+    creator?: boolean;
+    fetchedAt?: string;
   }>;
-  hasMore: boolean;
-  fetchedCount: number;
 }
 ```
 
-**Use Cases**:
-- Fetching a specific page of results
-- Testing API connectivity
-- Sampling members from a large group
+**Filtering Logic**:
+A member is included if ANY of these are true:
+- `isPremium === true` (from ConnectSafely.ai response)
+- `isVerified === true` (from ConnectSafely.ai response)
+- `badges` array includes `"premium"` (from ConnectSafely.ai response)
+- `badges` array includes `"verified"` (from ConnectSafely.ai response)
 
-**Example**: Fetch first 50 members starting from position 0
+**Use Cases**:
+- Quick extraction of premium/verified members
+- Building lead lists
+- One-command member extraction
 
 ---
 
 ### 2. Fetch All LinkedIn Group Members (`fetch-all-linkedin-group-members`)
 
-**Purpose**: Automatically fetch ALL members from a LinkedIn group by handling pagination internally. This tool continues fetching until all members are retrieved or a maximum limit is reached.
+**Purpose**: Fetch ALL members from a LinkedIn group using ConnectSafely.ai API with automatic pagination. Returns all members (not filtered).
+
+**How it works with ConnectSafely.ai**:
+- Continuously calls ConnectSafely.ai API until `hasMore` is `false`
+- Uses batch size of 50 members per request
+- Automatically increments `start` parameter for pagination
+- Respects `maxMembers` limit if provided
 
 **Input Parameters**:
-- `apiToken` (string, required): ConnectSafely.ai API bearer token
 - `groupId` (string, required): LinkedIn group ID
-- `batchSize` (number, optional): Members per API request (1-100, default: 50)
-- `maxMembers` (number, optional): Maximum members to fetch (optional limit to prevent excessive API calls)
-
-**Output**:
-```typescript
-{
-  allMembers: Array<GroupMember>;  // Same structure as above
-  totalFetched: number;
-  requestsMade: number;
-}
-```
-
-**Use Cases**:
-- Extracting complete member lists from groups
-- Bulk data collection for analysis
-- When you need all members without manual pagination
-
-**Features**:
-- Automatic pagination handling
-- Built-in rate limiting (500ms delay between requests)
-- Optional maximum member limit
-- Progress tracking via request count
-
-**Example**: Fetch all members from group "9357376" with a maximum of 1000 members
-
----
-
-### 3. Filter Premium/Verified Members (`filter-premium-verified-members`)
-
-**Purpose**: Filter an array of LinkedIn group members to only include Premium or Verified profiles. This tool checks multiple indicators including `isPremium`, `isVerified` flags and badge arrays.
-
-**Input Parameters**:
-- `members` (array, required): Array of group members to filter (from fetch tools)
-
-**Output**:
-```typescript
-{
-  filteredMembers: Array<{
-    profileId: string;
-    firstName: string;
-    lastName: string;
-    fullName: string;
-    headline: string;
-    publicIdentifier: string;
-    profileUrl: string;
-    followerCount: number;
-    isPremium: boolean;
-    isVerified: boolean;
-    badges: string;  // Comma-separated string
-    relationshipStatus: string;
-    creator: boolean;
-    fetchedAt: string;  // ISO timestamp
-  }>;
-  totalFiltered: number;
-  originalCount: number;
-}
-```
-
-**Filtering Logic**:
-The tool includes members if ANY of the following are true:
-- `isPremium === true`
-- `isVerified === true`
-- Badges array includes "premium"
-- Badges array includes "verified"
-
-**Use Cases**:
-- Identifying high-value prospects
-- Finding decision-makers and influencers
-- Building premium lead lists
-
-**Example**: Filter 500 members to find only Premium/Verified profiles
-
----
-
-### 4. Export Members to Google Sheets (`export-members-to-google-sheets`)
-
-**Purpose**: Export LinkedIn group members to an existing Google Sheet. Automatically handles duplicate detection using Profile ID and only appends new members.
-
-**Input Parameters**:
-- `members` (array, required): Array of processed members to export
-- `spreadsheetId` (string, required): Google Sheets spreadsheet ID (from URL)
-- `sheetName` (string, required): Sheet name/tab within the spreadsheet
-- `accessToken` (string, required): Google OAuth2 access token
-
-**Output**:
-```typescript
-{
-  success: boolean;
-  rowsAdded: number;
-  spreadsheetUrl: string;
-}
-```
-
-**Features**:
-- Automatic duplicate detection (by Profile ID)
-- Only appends new members (skips existing)
-- Returns spreadsheet URL for easy access
-
-**Use Cases**:
-- Adding new members to existing spreadsheets
-- Updating member databases
-- Incremental data collection
-
-**Example**: Export 50 filtered members to an existing Google Sheet
-
----
-
-### 5. Complete Group Members Workflow (`complete-group-members-workflow`)
-
-**Purpose**: End-to-end automation that fetches all LinkedIn group members, filters for Premium/Verified profiles, and exports to Google Sheets in a single operation. This is the most comprehensive tool for complete automation.
-
-**Input Parameters**:
-- `apiToken` (string, required): ConnectSafely.ai API bearer token
-- `groupId` (string, required): LinkedIn group ID
-- `batchSize` (number, optional): Members per API request (1-100, default: 50)
-- `spreadsheetId` (string, required): Google Sheets spreadsheet ID
-- `sheetName` (string, required): Sheet name/tab
-- `googleAccessToken` (string, required): Google OAuth2 access token
-- `filterPremiumOnly` (boolean, optional): Only include Premium/Verified members (default: true)
 - `maxMembers` (number, optional): Maximum members to fetch
 
 **Output**:
 ```typescript
 {
-  success: boolean;
   totalFetched: number;
-  totalFiltered: number;
-  rowsExported: number;
-  requestsMade: number;
-  spreadsheetUrl: string;
-  summary: string;
+  members: Array<LinkedInMember>;
 }
 ```
 
-**Workflow Steps**:
-1. Fetches all members with automatic pagination
-2. Filters for Premium/Verified members (if enabled)
-3. Processes member data for export
-4. Checks existing sheet for duplicates
-5. Appends only new members to Google Sheets
-
 **Use Cases**:
-- One-click complete automation
-- Scheduled member extraction
-- Bulk data collection and export
-
-**Example**: Extract all Premium/Verified members from group "9357376" and export to Google Sheets
+- Getting complete member lists
+- Bulk data collection
+- When you need all members (not just premium/verified)
 
 ---
 
-### 6. Get Group Members by URL (`get-group-members-by-url`)
+### 3. Fetch LinkedIn Group Members (`fetch-linkedin-group-members`)
 
-**Purpose**: Fetch LinkedIn group members using the group URL instead of requiring the group ID. Automatically extracts the group ID from the URL.
+**Purpose**: Fetch a single paginated batch of members from ConnectSafely.ai API. Provides fine-grained control over pagination.
+
+**How it works with ConnectSafely.ai**:
+- Makes a single API call to ConnectSafely.ai
+- Returns one page of results
+- Useful for testing or specific page extraction
 
 **Input Parameters**:
-- `apiToken` (string, required): ConnectSafely.ai API bearer token
-- `groupUrl` (string, required): LinkedIn group URL (e.g., "https://www.linkedin.com/groups/9357376/")
-- `count` (number, optional): Number of members per request (1-100, default: 50)
-- `start` (number, optional): Pagination offset (default: 0)
+- `groupId` (string, required): LinkedIn group ID
+- `start` (number, required): Pagination offset
+- `count` (number, required): Number of members per request (max 50)
 
 **Output**:
 ```typescript
 {
-  members: Array<{
-    profileId: string;
-    firstName: string;
-    lastName: string;
-    fullName: string;
-    headline: string;
-  }>;
+  members: Array<LinkedInMember>;
   hasMore: boolean;
-  groupId: string;  // Extracted group ID
+  fetched: number;
 }
 ```
 
-**Features**:
-- Automatic group ID extraction from URL
-- Supports various LinkedIn URL formats
-- Returns extracted group ID for reference
+**Use Cases**:
+- Testing API connectivity
+- Fetching specific pages
+- Sampling members from a group
+
+---
+
+### 4. Fetch Group Members by URL (`fetch-group-members-by-url`)
+
+**Purpose**: Resolve a LinkedIn group URL to a groupId, then fetch members. User-friendly interface when you only have the URL.
+
+**How it works**:
+- Extracts groupId from various LinkedIn URL formats
+- Then uses ConnectSafely.ai API to fetch members
+
+**Input Parameters**:
+- `groupUrl` (string, required): LinkedIn group URL (e.g., "https://www.linkedin.com/groups/9357376/")
+
+**Output**:
+```typescript
+{
+  groupId: string;
+}
+```
 
 **Use Cases**:
 - When you only have the group URL
+- User-friendly interface
 - Quick extraction without manual ID lookup
-- User-friendly interface for non-technical users
-
-**Example**: Fetch members using "https://www.linkedin.com/groups/9357376/"
 
 ---
 
-### 7. Create Google Sheet (`create-google-sheet`)
+### 5. Filter Premium/Verified Members (`filter-premium-verified-members`)
 
-**Purpose**: Create a new Google Spreadsheet with custom sheet name and optional header row. Perfect for setting up sheets before adding LinkedIn member data.
+**Purpose**: Filter an array of members to only include Premium or Verified profiles. Uses the same logic as the complete workflow tool.
 
 **Input Parameters**:
-- `accessToken` (string, required): Google OAuth2 access token
-- `spreadsheetTitle` (string, required): Title of the new spreadsheet
-- `sheetName` (string, optional): Name of the first sheet/tab (default: "Sheet1")
-- `includeHeaders` (boolean, optional): Add header row for LinkedIn member data (default: true)
-- `customHeaders` (array, optional): Custom header row (if not using default LinkedIn headers)
+- `members` (array, required): Array of members to filter
+
+**Output**:
+```typescript
+{
+  totalInput: number;
+  totalFiltered: number;
+  members: Array<LinkedInMember>;
+}
+```
+
+**Use Cases**:
+- Post-processing fetched members
+- Re-filtering existing data
+- Combining with other tools
+
+---
+
+### 6. Google Sheets Tool (`google-sheets-members`)
+
+**Purpose**: Create or update Google Sheets with LinkedIn member data. Automatically handles authentication and duplicate detection.
+
+**How it works**:
+- Automatically retrieves Google access token from environment variables or token generator
+- Creates new spreadsheets or updates existing ones
+- Detects duplicates by Profile ID
+- Only adds new members
+
+**Input Parameters**:
+- `members` (array, required): Array of members to add
+- `spreadsheetId` (string, optional): Existing spreadsheet ID (if updating)
+- `spreadsheetTitle` (string, optional): Title for new spreadsheet
+- `sheetName` (string, optional): Sheet name (default: "LinkedIn Members")
 
 **Output**:
 ```typescript
@@ -411,213 +450,178 @@ The tool includes members if ANY of the following are true:
   success: boolean;
   spreadsheetId: string;
   spreadsheetUrl: string;
-  sheetId: number;
-  sheetName: string;
-  headersAdded: boolean;
-}
-```
-
-**Default Headers** (if `includeHeaders: true`):
-- Profile ID
-- First Name
-- Last Name
-- Full Name
-- Headline
-- Public Identifier
-- Profile URL
-- Follower Count
-- Is Premium
-- Is Verified
-- Badges
-- Relationship Status
-
-**Features**:
-- Automatic header formatting (bold, gray background)
-- Frozen header row for easy scrolling
-- Customizable sheet configuration
-
-**Use Cases**:
-- Setting up new spreadsheets for member data
-- Creating organized data structures
-- Preparing sheets for bulk imports
-
-**Example**: Create a new spreadsheet titled "LinkedIn Premium Members - Q1 2024"
-
----
-
-### 8. Add Data to Google Sheet (`add-data-to-google-sheet`)
-
-**Purpose**: Generic tool for adding rows of data to an existing Google Sheet. Supports append, update, and append-or-update modes with duplicate detection.
-
-**Input Parameters**:
-- `accessToken` (string, required): Google OAuth2 access token
-- `spreadsheetId` (string, required): Google Sheets spreadsheet ID
-- `sheetName` (string, required): Sheet name/tab
-- `data` (array, required): 2D array of data to add `[[row1], [row2], ...]`
-- `mode` (enum, optional): How to add data:
-  - `"append"`: Always add new rows
-  - `"update"`: Only update existing rows
-  - `"appendOrUpdate"`: Add if new, update if exists (default: "append")
-- `uniqueColumnIndex` (number, optional): Column index (0-based) for duplicate detection (default: 0)
-- `startRow` (number, optional): Start from specific row (for append mode)
-
-**Output**:
-```typescript
-{
-  success: boolean;
-  rowsProcessed: number;
-  rowsAdded: number;
-  rowsUpdated: number;
-  spreadsheetUrl: string;
-  range: string;
-}
-```
-
-**Modes Explained**:
-- **Append**: Always adds new rows, no duplicate checking
-- **Update**: Only updates existing rows based on unique column, ignores new data
-- **Append or Update**: Smart mode - adds new rows, updates existing ones
-
-**Use Cases**:
-- Generic data export to Google Sheets
-- Updating existing records
-- Bulk data operations
-- Flexible data management
-
-**Example**: Add 100 rows of data with append-or-update mode using column 0 as unique identifier
-
----
-
-### 9. Create Sheet and Add Members (`create-sheet-and-add-members`)
-
-**Purpose**: Complete workflow tool that creates a new Google Sheet with proper headers and adds LinkedIn group member data in one operation. This is the recommended tool for creating new spreadsheets with member data.
-
-**Input Parameters**:
-- `accessToken` (string, required): Google OAuth2 access token
-- `spreadsheetTitle` (string, required): Title for the new spreadsheet
-- `sheetName` (string, optional): Name of the sheet/tab (default: "LinkedIn Members")
-- `members` (array, required): Array of LinkedIn members to add
-
-**Output**:
-```typescript
-{
-  success: boolean;
-  spreadsheetId: string;
-  spreadsheetUrl: string;
+  spreadsheetTitle: string;
   sheetName: string;
   membersAdded: number;
+  membersSkipped: number;
+  isNewSheet: boolean;
   summary: string;
 }
 ```
 
-**Workflow Steps**:
-1. Creates new Google Spreadsheet
-2. Sets up sheet with proper grid properties
-3. Adds formatted header row (bold, blue background, white text)
-4. Appends all member data
-5. Returns spreadsheet URL
-
 **Features**:
-- One-step sheet creation and data population
-- Professional header formatting
-- Frozen header row
-- Complete member data structure
+- Automatic duplicate detection by Profile ID
+- Creates new sheets with formatted headers
+- Updates existing sheets with new members only
+- Returns spreadsheet URL for easy access
 
 **Use Cases**:
-- Creating new spreadsheets from scratch
-- Quick export of filtered members
-- One-click complete workflow
-- Recommended for most use cases
-
-**Example**: Create "Premium Members - Tech Group" spreadsheet and add 50 filtered members
+- Exporting member data
+- Building lead databases
+- Sharing results with teams
 
 ---
 
-## Tool Usage Recommendations
+## 🔄 Typical Workflows
 
-### For Quick Extraction
-1. Use `fetch-all-linkedin-group-members` to get all members
-2. Use `filter-premium-verified-members` to filter
-3. Use `create-sheet-and-add-members` to export
+### Workflow 1: Extract Premium Members Only
 
-### For Incremental Updates
-1. Use `fetch-linkedin-group-members` for specific pages
-2. Use `export-members-to-google-sheets` to add to existing sheet
+```
+User: "fetch 10 premium members from group 9357376"
+  ↓
+Agent uses: completeGroupMembersWorkflowTool
+  ↓
+ConnectSafely.ai API calls (automatic pagination)
+  ↓
+Filtering for Premium/Verified (real-time)
+  ↓
+Returns: 10 premium/verified members
+```
 
-### For Complete Automation
-1. Use `complete-group-members-workflow` for end-to-end automation
+### Workflow 2: Extract and Export to Google Sheets
 
-### For User-Friendly Interface
-1. Use `get-group-members-by-url` when users only have URLs
-2. Combine with `create-sheet-and-add-members` for seamless experience
+```
+User: "get premium members from group 9357376 and save to Google Sheets"
+  ↓
+Agent uses: completeGroupMembersWorkflowTool
+  ↓
+ConnectSafely.ai API calls
+  ↓
+Filtering for Premium/Verified
+  ↓
+Agent uses: googleSheetsTool
+  ↓
+Creates/updates Google Sheet
+  ↓
+Returns: Spreadsheet URL and summary
+```
 
-## Project Structure
+### Workflow 3: Extract from Group URL
+
+```
+User: "extract members from https://www.linkedin.com/groups/9357376/"
+  ↓
+Agent uses: fetchGroupMembersByUrlTool
+  ↓
+Extracts groupId: "9357376"
+  ↓
+Agent uses: completeGroupMembersWorkflowTool
+  ↓
+Returns: Premium/Verified members
+```
+
+---
+
+## 🏗️ Project Structure
 
 ```
 extract-linkedin-premium-users-from-linkedin-groups/
-├── agents/
-│   ├── src/
-│   │   └── mastra/
-│   │       ├── index.ts                    # Mastra configuration
-│   │       ├── agents/
-│   │       │   └── linkedin-group-extractor-agent.ts  # Main agent definition
-│   │       └── tools/
-│   │           └── linkedin-group-extractor-tools.ts   # API integration tools
-│   └── package.json
-└── README.md
+└── agentic/
+    ├── agent.ts                          # CLI entry point
+    ├── package.json                      # Dependencies and scripts
+    ├── tsconfig.json                     # TypeScript configuration
+    ├── .env                              # Environment variables (create this)
+    ├── dist/                             # Compiled JavaScript (after build)
+    └── mastra/
+        ├── index.ts                      # Mastra configuration
+        ├── agents/
+        │   └── linkedin-group-members-fetcher-agent.ts  # Agent definition
+        └── tools/
+            ├── linkedin/
+            │   ├── index.ts              # Tool exports
+            │   ├── types.ts               # TypeScript types
+            │   ├── complete-group-members-workflow.ts    # Main workflow tool
+            │   ├── fetch-all-linkedin-group-members.ts   # Fetch all tool
+            │   ├── fetch-linkedIn-group-members-tool.ts   # Single batch tool
+            │   ├── fetch-group-members-by-url.ts         # URL resolver tool
+            │   └── filter-premium-members-tool.ts       # Filter tool
+            └── googlesheet/
+                ├── index.ts
+                └── google-sheet.ts        # Google Sheets integration
 ```
 
-## Related Resources
+---
 
-This project is inspired by and compatible with the n8n workflow template:
+## 🔧 Environment Variables
 
-- **[n8n Workflow Template](https://n8n.io/workflows/11450-extract-premium-and-verified-linkedin-group-members-to-google-sheets-with-connectsafelyai/)**: A no-code automation workflow that performs similar LinkedIn group member extraction using ConnectSafely.ai
+### Required
 
-### Key Differences
+- `CONNECTSAFELY_API_TOKEN` - Your ConnectSafely.ai API key
 
-- **n8n Workflow**: Visual workflow builder, no-code solution
-- **This Project**: Agentic framework with AI-powered agent that can make decisions and handle complex workflows
+### Optional (for Google Sheets)
 
-Both solutions use the same ConnectSafely.ai API and can achieve similar results, but this Mastra-based approach provides more flexibility and AI-driven automation capabilities.
+- `GOOGLE_CLIENT_ID` - Google OAuth client ID
+- `GOOGLE_CLIENT_SECRET` - Google OAuth client secret
+- `GOOGLE_REFRESH_TOKEN` - Google OAuth refresh token
 
-## Documentation & Support
+---
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**Issue**: "Failed to fetch LinkedIn group members" or "Unauthorized"
+
+- **Solution**: 
+  - Verify your `CONNECTSAFELY_API_TOKEN` is set correctly in `.env`
+  - Check that your ConnectSafely.ai API key is valid and active
+  - Ensure you're a member of the target LinkedIn group (ConnectSafely.ai can only access groups you've joined)
+
+**Issue**: Empty results returned
+
+- **Solution**: 
+  - Verify you're a member of the target LinkedIn group
+  - Check that the groupId is correct
+  - Some groups may have privacy settings that limit member visibility
+
+**Issue**: "Failed to refresh Google access token"
+
+- **Solution**: 
+  - Verify your Google OAuth credentials are set in `.env`
+  - Ensure `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `GOOGLE_REFRESH_TOKEN` are all present
+  - Check that your refresh token hasn't expired
+
+**Issue**: Build errors with module not found
+
+- **Solution**: 
+  - Ensure all imports use `.js` extensions (even for `.ts` files)
+  - Run `npm run build` to compile TypeScript
+  - Check that `dist/` directory exists after build
+
+**Issue**: Agent doesn't understand my query
+
+- **Solution**: 
+  - Be specific about what you want (e.g., "fetch 10 premium members from group 9357376")
+  - Include the group ID or URL
+  - Mention if you want to save to Google Sheets
+
+---
+
+## 📚 Documentation & Support
 
 ### Official Documentation
 
 - **ConnectSafely.ai Docs**: https://connectsafely.ai/docs
+- **ConnectSafely.ai Dashboard**: https://connectsafely.ai
 - **Mastra Documentation**: https://mastra.ai/docs
-- **API Reference**: Available in ConnectSafely.ai dashboard
 
-### Support Channels
+### ConnectSafely.ai Support
 
-- **Email Support**: support@connectsafely.ai
+- **Email**: support@connectsafely.ai
 - **Documentation**: https://connectsafely.ai/docs
+- **Dashboard**: https://connectsafely.ai (for API key management)
 
-## Troubleshooting
-
-### Common Issues
-
-**Issue**: Empty results returned
-
-- **Solution**: Verify you're a member of the target LinkedIn group; API can only access groups you've joined
-
-**Issue**: "401 Unauthorized" errors
-
-- **Solution**: Check that your ConnectSafely.ai API key is valid and correctly provided
-
-**Issue**: Pagination seems infinite
-
-- **Solution**: This is expected behavior until `hasMore` returns false; large groups may take several minutes to fully process
-
-**Issue**: Missing data in certain fields
-
-- **Solution**: Not all profiles have complete data; the agent handles null values gracefully
-
-## License
-
-MIT License - See LICENSE file for details
-
-## Connect With ConnectSafely.ai
+### Connect With ConnectSafely.ai
 
 Stay updated with the latest automation tips, LinkedIn strategies, and platform updates:
 
@@ -626,3 +630,18 @@ Stay updated with the latest automation tips, LinkedIn strategies, and platform 
 - **Instagram**: [instagram.com/connectsafely.ai](https://instagram.com/connectsafely.ai)
 - **Facebook**: [facebook.com/connectsafelyai](https://facebook.com/connectsafelyai)
 - **X (Twitter)**: [x.com/AiConnectsafely](https://x.com/AiConnectsafely)
+
+---
+
+## 📝 License
+
+MIT License - See LICENSE file for details
+
+---
+
+## 🙏 Acknowledgments
+
+This project is built on:
+- **[ConnectSafely.ai](https://connectsafely.ai)** - LinkedIn automation API platform
+- **[Mastra](https://mastra.ai)** - Agentic framework for building AI agents
+- **[Google Gemini](https://deepmind.google/technologies/gemini/)** - AI model powering the agent
