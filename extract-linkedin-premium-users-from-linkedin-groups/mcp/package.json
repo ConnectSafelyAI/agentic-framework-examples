@@ -1,0 +1,40 @@
+{
+    "name": "connectsafely-linkedin-premium-members-extractor",
+    "version": "1.0.0",
+    "description": "LinkedIn automation agent using Mastra and ConnectSafely MCP",
+    "type": "module",
+    "main": "dist/index.js",
+    "scripts": {
+      "dev": "tsx watch src/index.ts",
+      "build": "tsc",
+      "start": "node dist/index.js",
+      "clean": "rm -rf dist",
+      "type-check": "tsc --noEmit"
+    },
+    "keywords": [
+      "linkedin",
+      "automation",
+      "mastra",
+      "mcp",
+      "ai-agent",
+      "connectsafely"
+    ],
+    "author": "Your Name",
+    "license": "MIT",
+    "dependencies": {
+      "@mastra/core": "latest",
+      "@mastra/mcp": "latest",
+      "@mastra/memory": "latest",
+      "@mastra/libsql": "latest",
+      "dotenv": "^16.4.5"
+    },
+    "devDependencies": {
+      "@types/node": "^20.11.0",
+      "tsx": "^4.7.0",
+      "typescript": "^5.3.3"
+    },
+    "engines": {
+      "node": ">=18.0.0"
+    }
+  }
+  
