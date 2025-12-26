@@ -137,63 +137,6 @@ async function interactiveMode() {
   }
 }
 
-/**
- * One-shot mode (existing functionality)
- */
-async function oneShotMode(query: string) {
-  const agent = createLinkedInAgent();
-  
-  const initialState = {
-    messages: [new HumanMessage(query)],
-  };
-
-  console.log("\n🤖 Starting LinkedIn Premium Members Agent (LangGraph)...\n");
-  console.log(`📝 Query: ${query}\n`);
-
-  const result = await agent.invoke(initialState);
-  
-  const messages = result.messages;
-  const lastMessage = messages[messages.length - 1];
-  
-  // Check for tool results
-  const toolMessages = messages.filter((m: any) => m._getType && m._getType() === "tool");
-  
-  // Extract text content
-  const textContent = "content" in lastMessage && lastMessage.content 
-    ? String(lastMessage.content).trim()
-    : "";
-
-  console.log("\n✅ Agent Response:");
-  if (textContent) {
-    console.log(textContent);
-  } else if (toolMessages.length > 0) {
-    console.log("Task completed successfully!\n");
-    console.log("📊 Tool Results:");
-    toolMessages.forEach((msg: any, idx: number) => {
-      try {
-        const toolResult = typeof msg.content === 'string' ? JSON.parse(msg.content) : msg.content;
-        console.log(`\n  ${idx + 1}. ${msg.name || 'Tool'}:`);
-        if (toolResult.spreadsheetUrl) {
-          console.log(`     📄 Spreadsheet: ${toolResult.spreadsheetUrl}`);
-        }
-        if (toolResult.totalFetched !== undefined) {
-          console.log(`     👥 Total fetched: ${toolResult.totalFetched}`);
-        }
-        if (toolResult.totalFiltered !== undefined) {
-          console.log(`     ✨ Premium/Verified: ${toolResult.totalFiltered}`);
-        }
-        if (toolResult.membersAdded !== undefined) {
-          console.log(`     ➕ Members added: ${toolResult.membersAdded}`);
-        }
-      } catch (e) {
-        console.log(`     ${String(msg.content).substring(0, 100)}...`);
-      }
-    });
-  } else {
-    console.log(JSON.stringify(lastMessage, null, 2));
-  }
-  console.log("\n");
-}
 
 /**
  * Show help message
@@ -220,23 +163,16 @@ async function main() {
   if (args.includes("--help") || args.includes("-h")) {
     console.log("\n📋 LinkedIn Premium Members Agent (LangGraph v0.2.x)\n");
     console.log("Usage:");
-    console.log("  npm run dev                    # Interactive mode");
-    console.log('  npm run dev -- "Your query"    # One-shot mode\n');
+    console.log("  bun run dev                    # Start interactive mode");
+    console.log("  bun start                      # Start interactive mode\n");
     console.log("Flags:");
-    console.log("  -i, --interactive              # Force interactive mode");
     console.log("  -h, --help                     # Show this help\n");
     showHelp();
     return;
   }
 
-  // Interactive mode if no arguments or -i flag
-  if (args.length === 0 || args.includes("-i") || args.includes("--interactive")) {
-    await interactiveMode();
-  } else {
-    // One-shot mode with query
-    const query = args.filter(arg => !arg.startsWith("-")).join(" ");
-    await oneShotMode(query);
-  }
+  // Always run in interactive mode
+  await interactiveMode();
 }
 
 // Run if this is the main module
@@ -247,4 +183,4 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   });
 }
 
-export { interactiveMode, oneShotMode };
+export { interactiveMode };
