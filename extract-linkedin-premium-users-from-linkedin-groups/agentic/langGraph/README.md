@@ -231,31 +231,33 @@ graph LR
 
 ```
 langGraph/
-├── agents/
-│   ├── linkedin-group-members-fetcher-agent.ts    # Main: Graph assembly (30 lines)
-│   ├── config/                                     # Configuration modules
-│   │   ├── tools.ts                               #   Tool registration (25 lines)
-│   │   ├── model.ts                               #   LLM initialization (15 lines)
-│   │   └── prompts.ts                             #   System prompts (145 lines)
-│   ├── nodes/                                      # Graph node functions
-│   │   ├── call-model.ts                          #   Agent node logic (48 lines)
-│   │   └── routing.ts                             #   Routing decisions (23 lines)
-│   └── utils/                                      # Helper utilities
-│       └── runner.ts                              #   CLI runner (27 lines)
-├── tools/
-│   ├── linkedin/                                   # ConnectSafely.ai integrations
-│   │   ├── complete-group-members-workflow.ts     # ⭐ Main workflow tool
-│   │   ├── fetch-linkedIn-group-members-tool.ts   # Single batch fetch
-│   │   ├── fetch-all-linkedin-group-members.ts    # Auto-pagination
-│   │   ├── fetch-group-members-by-url.ts          # URL resolver
-│   │   ├── filter-premium-members-tool.ts         # Client-side filter
+├── agents/                                         # Agent implementation
+│   ├── linkedin-group-members-fetcher-agent.ts    #   Main graph assembly (42 lines)
+│   ├── config/                                     #   Configuration modules
+│   │   ├── model.ts                               #     LLM initialization (33 lines)
+│   │   └── prompts.ts                             #     System prompts (129 lines)
+│   └── nodes/                                      #   Graph node functions
+│       ├── call-model.ts                          #     Agent node logic (52 lines)
+│       └── routing.ts                             #     Routing decisions (28 lines)
+├── cli/                                            # Interactive CLI
+│   ├── interactive.ts                             #   Main REPL loop (90 lines)
+│   ├── display.ts                                 #   Response formatting (100 lines)
+│   ├── commands.ts                                #   Command handlers (45 lines)
+│   └── README.md                                  #   CLI documentation
+├── tools/                                          # ConnectSafely.ai & Google Sheets
+│   ├── linkedin/                                   #   ConnectSafely.ai integrations
+│   │   ├── complete-group-members-workflow.ts     #     ⭐ Main workflow tool
+│   │   ├── fetch-linkedIn-group-members-tool.ts   #     Single batch fetch
+│   │   ├── fetch-all-linkedin-group-members.ts    #     Auto-pagination
+│   │   ├── fetch-group-members-by-url.ts          #     URL resolver
+│   │   ├── filter-premium-members-tool.ts         #     Client-side filter
 │   │   └── index.ts
 │   ├── googlesheet/
-│   │   ├── google-sheet.ts                        # Google Sheets export
+│   │   ├── google-sheet.ts                        #     Google Sheets export
 │   │   └── index.ts
 │   └── types/
-│       └── index.ts                               # TypeScript types
-├── index.ts                                       # Interactive CLI
+│       └── index.ts                               #     TypeScript types
+├── index.ts                                        # Main entry point (40 lines)
 ├── package.json
 ├── tsconfig.json
 └── README.md
@@ -265,22 +267,30 @@ langGraph/
 
 Each module has **one clear responsibility**:
 
+#### Agent Modules
 | Module | Responsibility | Lines |
 |--------|----------------|-------|
-| **linkedin-group-members-fetcher-agent.ts** | Graph assembly only | ~30 |
-| **config/tools.ts** | Register all tools | ~25 |
-| **config/model.ts** | Initialize LLM | ~15 |
-| **config/prompts.ts** | Define system prompts | ~145 |
-| **nodes/call-model.ts** | LLM invocation & filtering | ~48 |
-| **nodes/routing.ts** | Workflow routing logic | ~23 |
-| **utils/runner.ts** | CLI helper | ~27 |
+| **linkedin-group-members-fetcher-agent.ts** | Graph assembly only | 42 |
+| **config/model.ts** | Initialize LLM & tools | 33 |
+| **config/prompts.ts** | Define system prompts | 129 |
+| **nodes/call-model.ts** | LLM invocation & filtering | 52 |
+| **nodes/routing.ts** | Workflow routing logic | 28 |
+
+#### CLI Modules
+| Module | Responsibility | Lines |
+|--------|----------------|-------|
+| **index.ts** | Entry point only | 40 |
+| **cli/interactive.ts** | REPL loop | 90 |
+| **cli/display.ts** | Response formatting | 100 |
+| **cli/commands.ts** | Command handlers | 45 |
 
 **Benefits:**
-- ✅ Small, focused files (15-145 lines vs. original 230)
+- ✅ Small, focused files (28-129 lines vs. original 230)
 - ✅ Easy to test individual components
 - ✅ Simple to modify without breaking other parts
 - ✅ Reusable across multiple agents
 - ✅ Clear separation of concerns
+- ✅ Better UX with @inquirer/prompts
 
 ## 🎯 Why ConnectSafely.ai?
 
@@ -381,6 +391,7 @@ Shows:
 - **LangGraph 0.2.x** - AI agent workflow framework
 - **Google Gemini 2.0** - Large language model for intent understanding
 - **Google Sheets API** - Export and storage
+- **@inquirer/prompts** - Modern CLI with input validation
 - **Bun** - Fast JavaScript/TypeScript runtime (no transpiling needed!)
 - **TypeScript** - Type safety with native execution
 

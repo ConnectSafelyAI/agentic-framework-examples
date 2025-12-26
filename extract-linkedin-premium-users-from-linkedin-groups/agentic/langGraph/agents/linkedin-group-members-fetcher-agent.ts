@@ -6,8 +6,8 @@
 import { StateGraph, START } from "@langchain/langgraph";
 import { ToolNode } from "@langchain/langgraph/prebuilt";
 import { AgentState } from "../tools/types/index.js";
-import { callModel } from "./nodes/call-model.js";
-import { shouldContinue } from "./nodes/routing.js";
+import { callModel } from "./handlers/call-model.js";
+import { shouldContinue } from "./handlers/routing.js";
 import { 
   completeGroupMembersWorkflowTool,
   fetchAllLinkedInGroupMembersTool, 
