@@ -1,0 +1,30 @@
+{
+    "name": "linkedin-premium-members-langgraph",
+    "version": "1.0.0",
+    "description": "LinkedIn Group Premium Member Extractor Agent with LangGraph",
+    "main": "dist/index.js",
+    "type": "module",
+    "scripts": {
+      "dev": "tsx index.ts",
+      "build": "tsc",
+      "start": "node dist/index.js"
+    },
+    "keywords": ["linkedin", "langgraph", "agent", "premium-members"],
+    "author": "",
+    "license": "ISC",
+    "engines": {
+      "node": ">=18.0.0"
+    },
+    "dependencies": {
+      "@langchain/core": "^0.3.30",
+      "@langchain/langgraph": "^0.2.28",
+      "@langchain/google-genai": "^0.1.6",
+      "dotenv": "^16.4.7",
+      "zod": "^3.24.1"
+    },
+    "devDependencies": {
+      "@types/node": "^22.10.5",
+      "tsx": "^4.19.2",
+      "typescript": "^5.7.2"
+    }
+  }
