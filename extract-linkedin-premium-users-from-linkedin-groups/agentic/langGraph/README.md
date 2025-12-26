@@ -236,14 +236,14 @@ langGraph/
 │   ├── config/                                     #   Configuration modules
 │   │   ├── model.ts                               #     LLM initialization (33 lines)
 │   │   └── prompts.ts                             #     System prompts (129 lines)
-│   └── nodes/                                      #   Graph node functions
+│   └── handlers/                                   #   Graph node handlers
 │       ├── call-model.ts                          #     Agent node logic (52 lines)
 │       └── routing.ts                             #     Routing decisions (28 lines)
 ├── cli/                                            # Interactive CLI
-│   ├── interactive.ts                             #   Main REPL loop (90 lines)
-│   ├── display.ts                                 #   Response formatting (100 lines)
-│   ├── commands.ts                                #   Command handlers (45 lines)
-│   └── README.md                                  #   CLI documentation
+│   ├── index.ts                                   #   CLI module exports (9 lines)
+│   ├── interactive.ts                             #   Main REPL loop (95 lines)
+│   ├── display.ts                                 #   Response formatting (98 lines)
+│   └── commands.ts                                #   Command handlers (46 lines)
 ├── tools/                                          # ConnectSafely.ai & Google Sheets
 │   ├── linkedin/                                   #   ConnectSafely.ai integrations
 │   │   ├── complete-group-members-workflow.ts     #     ⭐ Main workflow tool
@@ -257,7 +257,7 @@ langGraph/
 │   │   └── index.ts
 │   └── types/
 │       └── index.ts                               #     TypeScript types
-├── index.ts                                        # Main entry point (40 lines)
+├── index.ts                                        # Main entry point (41 lines)
 ├── package.json
 ├── tsconfig.json
 └── README.md
@@ -273,16 +273,17 @@ Each module has **one clear responsibility**:
 | **linkedin-group-members-fetcher-agent.ts** | Graph assembly only | 42 |
 | **config/model.ts** | Initialize LLM & tools | 33 |
 | **config/prompts.ts** | Define system prompts | 129 |
-| **nodes/call-model.ts** | LLM invocation & filtering | 52 |
-| **nodes/routing.ts** | Workflow routing logic | 28 |
+| **handlers/call-model.ts** | LLM invocation & filtering | 52 |
+| **handlers/routing.ts** | Workflow routing logic | 28 |
 
 #### CLI Modules
 | Module | Responsibility | Lines |
 |--------|----------------|-------|
-| **index.ts** | Entry point only | 40 |
-| **cli/interactive.ts** | REPL loop | 90 |
-| **cli/display.ts** | Response formatting | 100 |
-| **cli/commands.ts** | Command handlers | 45 |
+| **index.ts** | Entry point only | 41 |
+| **cli/index.ts** | CLI module exports | 9 |
+| **cli/interactive.ts** | REPL loop | 95 |
+| **cli/display.ts** | Response formatting | 98 |
+| **cli/commands.ts** | Command handlers | 46 |
 
 **Benefits:**
 - ✅ Small, focused files (28-129 lines vs. original 230)
