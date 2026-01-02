@@ -11,11 +11,11 @@ This project relies on [ConnectSafely.ai](https://connectsafely.ai) for reliable
 **ConnectSafely.ai** provides the essential infrastructure for this agent:
 *   **Safe & Compliant:** Handles LinkedIn session management and rate limiting automatically.
 *   **Rich Data:** Returns detailed profile information including premium status, badges, and verification status.
-*   **Simple API:** easy-to-use endpoints for fetching group members, profiles, and more.
+*   **Simple API:** Easy-to-use endpoints for fetching group members, profiles, and more.
 
 ## ✨ Features
 
-*   ** automated Extraction:** Fetches thousands of members from any LinkedIn group you are part of.
+*   **Automated Extraction:** Fetches thousands of members from any LinkedIn group you are part of.
 *   **Intelligent Filtering:** Agents analyze profiles to identify Premium subscribers and Verified users (high-value leads).
 *   **Google Sheets Export:** Automatically saves filtered leads to a formatted Google Sheet.
 *   **Multi-Agent Workflow:**
@@ -75,15 +75,27 @@ uv run streamlit run App.py
 
 ## 📁 Project Structure
 
+The codebase is modular and designed for maintainability:
+
 ```text
 crewai/
 ├── agents/             # AI Agent definitions
-├── tasks/              # Task definitions (Fetch, Filter, Export)
+│   └── agents.py
+├── tasks/              # Task definitions
+│   ├── fetch_members_task.py
+│   ├── filter_premium_task.py
+│   └── export_to_sheets_task.py
 ├── tools/              # Custom tools
-│   ├── Linkedin/       # ConnectSafely.ai integration tools
-│   └── googleSheet/    # Google Sheets API tools
+│   ├── Linkedin/       # ConnectSafely.ai integration
+│   │   ├── FetchLinkedInGroupMembersTool.py
+│   │   └── ...
+│   └── googleSheet/    # Google Sheets API integration
+│       ├── googleSheetsAuth.py
+│       ├── googleSheetsClient.py
+│       └── googleSheetsTools.py
 ├── App.py              # Streamlit User Interface
-├── crew.py             # Main CrewAI orchestration logic
+├── crew.py             # Facade for CrewAI execution
+├── workflows.py        # Workflow orchestration logic
 └── pyproject.toml      # Dependency configuration
 ```
 
