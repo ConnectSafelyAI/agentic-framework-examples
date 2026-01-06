@@ -4,6 +4,23 @@ A powerful AI agent system built with **CrewAI** that leverages the **ConnectSaf
 
 This tool automates the process of finding potential leads by fetching members from LinkedIn groups and intelligently filtering for Premium and Verified profiles using a team of specialized AI agents.
 
+## 🎥 Demo Video
+
+<video src="assets/crewai-video.mp4" controls="controls" style="max-width: 100%;">
+</video>
+
+*(If the video doesn't load, you can find it at `assets/crewai-video.mp4`)*
+
+## 📸 Screenshots
+
+| Streamlit Interface | Workflow Execution |
+| ------------------- | ------------------ |
+| ![Interface](assets/Screenshot_2026-01-05_17-15-15.png) | ![Execution](assets/Screenshot_2026-01-05_17-15-40.png) |
+
+| Filtered Results | Google Sheets Export |
+| ---------------- | -------------------- |
+| ![Results](assets/Screenshot_2026-01-05_17-16-00.png) | ![Export](assets/Screenshot_2026-01-05_17-16-47.png) |
+
 ## 🚀 Powered by ConnectSafely.ai
 
 This project relies on [ConnectSafely.ai](https://connectsafely.ai) for reliable and safe LinkedIn data extraction.

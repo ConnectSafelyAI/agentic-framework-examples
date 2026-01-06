@@ -1,10 +1,13 @@
 import os
+
+# Disable CrewAI telemetry
+os.environ["OTEL_SDK_DISABLED"] = "true"
+os.environ["CREWAI_TELEMETRY_OPT_OUT"] = "true"
+
 import streamlit as st
 from dotenv import load_dotenv
 from crew import LinkedInCrew
 
-# Disable CrewAI telemetry
-os.environ["CREWAI_TELEMETRY_OPT_OUT"] = "true"
 load_dotenv()
 
 
