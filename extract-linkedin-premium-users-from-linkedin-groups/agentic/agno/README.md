@@ -159,10 +159,17 @@ The UI will open in your browser at `http://localhost:8501`.
 
 ## 📁 Project Structure
 
+The codebase is modular and organized for maintainability:
+
 ```
 agno/
 ├── agents/
 │   └── agent.py              # CLI agent definition
+├── config/                   # Configuration and workflow modules
+│   ├── __init__.py
+│   ├── constants.py          # Constants, page config, and help text
+│   ├── agent_setup.py        # Agent initialization and setup
+│   └── workflows.py          # Workflow execution handlers
 ├── tools/
 │   ├── linkedin/             # ConnectSafely.ai integration tools
 │   │   ├── fetch_linkedIn_group_members_tool.py
@@ -173,10 +180,19 @@ agno/
 │   └── googlesheet/          # Google Sheets export tools
 │       ├── export_members_to_sheets_tool.py
 │       └── google_sheets_tool.py
-├── App.py                    # Streamlit web interface
+├── App.py                    # Streamlit web interface (main entry point)
 ├── pyproject.toml            # Dependencies and project config
 └── README.md                 # This file
 ```
+
+### Code Organization
+
+- **`App.py`**: Main Streamlit UI that orchestrates the interface and user interactions
+- **`config/constants.py`**: Centralized configuration including page settings, workflow types, help text, and agent instructions
+- **`config/agent_setup.py`**: Agent initialization logic, tool imports, and session state management
+- **`config/workflows.py`**: Workflow execution handlers for Complete, Multi-Step, and Fetch-Only workflows
+
+All files are kept under 100 lines for better maintainability and readability.
 
 ---
 
