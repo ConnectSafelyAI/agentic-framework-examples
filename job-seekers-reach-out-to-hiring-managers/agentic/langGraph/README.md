@@ -1,6 +1,6 @@
 # LinkedIn Job Search → Hiring Manager Outreach Agent
 
-An intelligent AI agent built with [Mastra](https://mastra.ai) that automates the job search process and helps job seekers connect with hiring managers using the [ConnectSafely.ai](https://connectsafely.ai) API. This agent enables job seekers to find relevant positions, identify hiring managers, and send personalized connection requests automatically.
+An intelligent AI agent built with [LangGraph](https://langchain-ai.github.io/langgraph/) that automates the job search process and helps job seekers connect with hiring managers using the [ConnectSafely.ai](https://connectsafely.ai) API. This agent enables job seekers to find relevant positions, identify hiring managers, and send personalized connection requests automatically.
 
 ## 🎯 Purpose
 
@@ -98,12 +98,14 @@ headers: {
 
 ## 🤖 How the Agent Works
 
-The **Job Search → Hiring Manager Outreach Agent** is an AI agent powered by Google's **Gemini 3 Flash Preview** model. It uses a set of specialized tools to interact with the ConnectSafely.ai API.
+The **Job Search → Hiring Manager Outreach Agent** is an AI agent powered by Google's **Gemini 3 Flash Preview** model, built with LangGraph for stateful, multi-step agent workflows. It uses a set of specialized tools to interact with the ConnectSafely.ai API.
 
 ### Agent Architecture
 
 ```
 User Query
+    ↓
+LangGraph State Machine
     ↓
 AI Agent (Gemini 3 Flash Preview)
     ↓
@@ -116,6 +118,15 @@ Data Processing & Analysis
 Response to User
 ```
 
+### LangGraph Workflow
+
+The agent uses LangGraph's state graph architecture:
+
+- **State Management**: Maintains conversation state across multiple tool calls
+- **Conditional Routing**: Intelligently routes between agent reasoning and tool execution
+- **Multi-Step Workflows**: Handles complex workflows that require multiple tool calls
+- **Error Recovery**: Built-in error handling and state recovery
+
 ### Agent Capabilities
 
 The agent can:
@@ -126,7 +137,7 @@ The agent can:
 - **Identify appropriate hiring managers** based on job titles
 - **Personalize connection messages** with hiring manager names and job details
 - **Check connection status** before sending requests
-- **Remember context** across multiple interactions
+- **Maintain conversation context** across multiple interactions
 
 ### Available Tools
 
@@ -149,13 +160,14 @@ The agent has access to 8 specialized tools:
 
 - **Bun** >= 1.0.0 - [Install Bun](https://bun.sh/docs/installation)
 - **ConnectSafely.ai API Key** - Get yours at [connectsafely.ai](https://connectsafely.ai)
+- **Google AI API Key** - Get yours at [Google AI Studio](https://aistudio.google.com/app/apikey)
 
 ### Installation
 
 1. **Navigate to the project directory**:
 
    ```bash
-   cd job-seekers-reach-out-to-hiring-managers/agentic/mastra
+   cd job-seekers-reach-out-to-hiring-managers/agentic/langGraph
    ```
 
 2. **Install dependencies**:
@@ -171,6 +183,9 @@ The agent has access to 8 specialized tools:
    ```env
    # ConnectSafely.ai API Token (Required)
    CONNECTSAFELY_API_TOKEN=your_connectsafely_api_token_here
+
+   # Google AI API Key (Required)
+   GOOGLE_GENERATIVE_AI_API_KEY=your_google_ai_api_key_here
    ```
 
 > **Note**: This project uses **Bun**, which can run TypeScript directly without building. No compilation step is required!
@@ -179,65 +194,61 @@ The agent has access to 8 specialized tools:
 
 ## 🚀 Usage
 
-The agent runs through the **Mastra UI**, a visual web interface that provides an intuitive way to interact with your agent, view tool executions, and monitor observability metrics.
+The agent runs in **interactive CLI mode**, providing a conversational interface where you can interact with the agent naturally.
 
-### Starting the Mastra UI
+### Starting the Agent
 
-**Start the Mastra UI:**
+**Interactive Mode:**
 
 ```bash
 bun run dev
 # or
-mastra dev --dir .
+bun start
+# or
+bun index.ts
 ```
 
-The `--dir .` flag tells Mastra to look for `index.ts` in the current directory instead of the default `src/mastra/` location.
+This starts an interactive session where you can:
+- Type queries naturally (e.g., "Find software engineering jobs in Australia")
+- Have a conversation with the agent
+- Watch the agent execute tools in real-time
+- See detailed responses and summaries
 
 **What happens:**
-1. Mastra starts a development server
-2. Opens a web UI in your browser (usually at `http://localhost:3000` or similar)
-3. You can interact with your `jobSearchOutreachAgent` through the visual interface
-4. See real-time tool execution, conversation history, and observability metrics
-
-**Benefits of Mastra UI:**
-- ✅ Visual interface for easier interaction
-- ✅ Real-time tool execution visibility
-- ✅ Conversation history timeline
-- ✅ Observability charts and metrics
-- ✅ Better debugging experience
-- ✅ Visual representation of agent workflows
-
-**Using the UI:**
-- Select the `jobSearchOutreachAgent` from the agents list
-- Type your query in the chat interface
-- Watch tools execute in real-time
-- View detailed results and summaries
-- Monitor agent performance and metrics
+1. The agent initializes with LangGraph state machine
+2. You're presented with an interactive prompt
+3. Type your query and press Enter
+4. The agent processes your request using available tools
+5. Results are displayed in a formatted, readable way
 
 ### Screenshots
 
-Here are some screenshots of the Mastra UI in action:
+Here are some screenshots of the agent in action:
 
-![Mastra UI - Agent Selection](./assets/Screenshot_2026-01-12_15-21-25.png)
-*Selecting the Job Search Outreach Agent from the agents list*
+![LangGraph Agent - Interactive Session](./assets/Screenshot_2026-01-12_17-55-40.png)
+*Interactive CLI session showing agent responses and tool execution*
 
-![Mastra UI - Tool Execution](./assets/Screenshot_2026-01-12_15-21-34.png)
-*Real-time tool execution and conversation interface*
-
-![Mastra UI - Results View](./assets/Screenshot_2026-01-12_18-39-16.png)
-*Viewing detailed results and agent responses*
+![LangGraph Agent - Results View](./assets/Screenshot_2026-01-12_18-29-55.png)
+*Detailed results showing jobs found and hiring managers identified*
 
 ### Example Queries
 
 The agent understands natural language queries:
 
 ```
-> Find software engineering jobs in Australia
-> Search for sales manager positions in New York and find hiring managers
-> Get jobs for marketing director in San Francisco and connect with recruiters
-> Find 5 software engineer jobs in Australia and send connection requests to hiring managers
-> Search for data scientist positions in London
+You: Find software engineering jobs in Australia
+You: Search for sales manager positions in New York and find hiring managers
+You: Get jobs for marketing director in San Francisco and connect with recruiters
+You: Find 5 software engineer jobs in Australia and send connection requests to hiring managers
+You: Search for data scientist positions in London
 ```
+
+### Special Commands
+
+The interactive CLI supports special commands:
+- Type `exit` or `quit` to exit the session
+- Type `clear` to reset conversation state
+- Type `help` for available commands
 
 ---
 
@@ -547,15 +558,24 @@ Returns: Jobs and hiring manager details (no connection requests)
 ```
 job-seekers-reach-out-to-hiring-managers/
 └── agentic/
-    └── mastra/
+    └── langGraph/
+        ├── index.ts                      # CLI entry point
         ├── package.json                  # Dependencies and scripts
         ├── tsconfig.json                 # TypeScript configuration
         ├── README.md                     # This file
         ├── .env                          # Environment variables (create this)
-        ├── index.ts                      # Mastra configuration
         ├── agents/
-        │   ├── job-search-outreach-agent.ts  # Agent definition
-        │   └── instructions.ts           # Agent instructions
+        │   ├── job-search-outreach-agent.ts  # Agent definition (LangGraph workflow)
+        │   └── config/
+        │       ├── model.ts              # Model configuration (Gemini 3 Flash)
+        │       ├── prompt.ts             # System prompt
+        │       ├── call-model.ts         # Model invocation handler
+        │       └── routing.ts            # Conditional routing logic
+        ├── cli/
+        │   ├── index.ts                  # CLI entry point
+        │   ├── interactive.ts           # Interactive mode implementation
+        │   ├── display.ts               # Display utilities
+        │   └── commands.ts              # Special command handlers
         ├── tools/
         │   ├── index.ts                  # Tool exports
         │   ├── types.ts                  # TypeScript types
@@ -578,6 +598,7 @@ job-seekers-reach-out-to-hiring-managers/
 ### Required
 
 - `CONNECTSAFELY_API_TOKEN` - Your ConnectSafely.ai API key
+- `GOOGLE_GENERATIVE_AI_API_KEY` - Your Google AI API key (for Gemini model)
 
 ---
 
@@ -591,6 +612,13 @@ job-seekers-reach-out-to-hiring-managers/
   - Verify your `CONNECTSAFELY_API_TOKEN` is set correctly in `.env`
   - Check that your ConnectSafely.ai API key is valid and active
   - Ensure the API key has the necessary permissions
+
+**Issue**: "API key not found" or "Invalid API key" for Google AI
+
+- **Solution**: 
+  - Verify your `GOOGLE_GENERATIVE_AI_API_KEY` is set correctly in `.env`
+  - Get your API key from [Google AI Studio](https://aistudio.google.com/app/apikey)
+  - Ensure the API key has access to Gemini models
 
 **Issue**: No jobs found
 
@@ -616,20 +644,12 @@ job-seekers-reach-out-to-hiring-managers/
   - Verify the profile ID (vanity name) is correct
   - Check if you've reached LinkedIn connection request limits
 
-**Issue**: "Missing required file" when running `mastra dev`
-
-- **Solution**: 
-  - Use the `--dir .` flag: `mastra dev --dir .`
-  - This tells Mastra to look for `index.ts` in the current directory
-  - Alternatively, update your `package.json` script: `"dev": "mastra dev --dir ."`
-
 **Issue**: Build errors with module not found
 
 - **Solution**: 
   - Ensure all imports use `.js` extensions (even for `.ts` files)
   - Verify all dependencies are installed: `bun install`
-  - With Bun, you don't need to build - the Mastra UI runs TypeScript directly
-  - Restart the Mastra dev server after making changes
+  - With Bun, you don't need to build - just run `bun index.ts` directly
 
 **Issue**: Agent doesn't understand my query
 
@@ -639,6 +659,14 @@ job-seekers-reach-out-to-hiring-managers/
   - Mention if you want to connect with hiring managers
   - Use clear job title keywords
 
+**Issue**: State machine errors or recursion limit reached
+
+- **Solution**: 
+  - The agent has a recursion limit of 50 steps
+  - If you see recursion limit errors, try breaking your query into smaller parts
+  - Use the `clear` command to reset conversation state
+  - Restart the interactive session if needed
+
 ---
 
 ## 📚 Documentation & Support
@@ -647,7 +675,9 @@ job-seekers-reach-out-to-hiring-managers/
 
 - **ConnectSafely.ai Docs**: https://connectsafely.ai/docs
 - **ConnectSafely.ai Dashboard**: https://connectsafely.ai
-- **Mastra Documentation**: https://mastra.ai/docs
+- **LangGraph Documentation**: https://langchain-ai.github.io/langgraph/
+- **LangChain Documentation**: https://js.langchain.com/
+- **Bun Documentation**: https://bun.sh/docs
 
 ### ConnectSafely.ai Support
 
@@ -677,6 +707,8 @@ MIT License - See LICENSE file for details
 
 This project is built on:
 - **[ConnectSafely.ai](https://connectsafely.ai)** - LinkedIn automation API platform
-- **[Mastra](https://mastra.ai)** - Agentic framework for building AI agents
+- **[LangGraph](https://langchain-ai.github.io/langgraph/)** - Stateful agent framework
+- **[LangChain](https://js.langchain.com/)** - LLM application framework
 - **[Google Gemini 3 Flash Preview](https://deepmind.google/technologies/gemini/)** - AI model powering the agent
+- **[Bun](https://bun.sh)** - Fast JavaScript runtime and package manager
 
