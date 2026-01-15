@@ -76,7 +76,7 @@ This project demonstrates the same use case implemented with **four different ag
 | **[AutoGen](autogen/)**     | Python     | Streamlit | Modular architecture, single assistant agent |
 | **[CrewAI](crewai/)**       | Python     | Streamlit | Unified agent, task-based execution          |
 | **[LangGraph](langGraph/)** | TypeScript | CLI       | Stateful workflows, multi-step reasoning     |
-| **[Mastra](mastra/)**       | TypeScript | CLI       | Agent orchestration, tool integration        |
+| **[Mastra](mastra/)**       | TypeScript | Mastra ui | Agent orchestration, tool integration        |
 
 ### Framework Comparison
 
