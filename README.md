@@ -4,7 +4,7 @@ A comprehensive collection of AI agent implementations demonstrating the same us
 
 ## 🎯 Use Cases
 
-This repository contains two main use cases, each implemented across multiple agent frameworks:
+This repository contains two main use cases, each implemented across multiple agent frameworks. Each use case has a comprehensive README in its `agentic/` folder explaining the product, its importance, and framework comparisons.
 
 ### 1. Job Seekers Reach Out to Hiring Managers
 
@@ -26,7 +26,9 @@ This repository contains two main use cases, each implemented across multiple ag
 - **Recruiters**: Find and connect with hiring managers at target companies
 - **Sales Professionals**: Identify decision-makers at companies with open positions
 
-**Location**: `job-seekers-reach-out-to-hiring-managers/`
+**Location**: [`job-seekers-reach-out-to-hiring-managers/agentic/`](job-seekers-reach-out-to-hiring-managers/agentic/)
+
+📖 **[Read the full use case documentation →](job-seekers-reach-out-to-hiring-managers/agentic/README.md)**
 
 ---
 
@@ -50,7 +52,9 @@ This repository contains two main use cases, each implemented across multiple ag
 - **Business Development**: Discover decision-makers in industry groups
 - **Lead Generation**: Automate finding potential customers
 
-**Location**: `extract-linkedin-premium-users-from-linkedin-groups/`
+**Location**: [`extract-linkedin-premium-users-from-linkedin-groups/agentic/`](extract-linkedin-premium-users-from-linkedin-groups/agentic/)
+
+📖 **[Read the full use case documentation →](extract-linkedin-premium-users-from-linkedin-groups/agentic/README.md)**
 
 ---
 
@@ -62,9 +66,10 @@ Each use case is implemented across multiple agent frameworks, allowing you to c
 
 | Platform      | Language   | Interface         | Location                                                      |
 | ------------- | ---------- | ----------------- | ------------------------------------------------------------- |
+| **AutoGen**   | Python     | Streamlit Web UI  | `job-seekers-reach-out-to-hiring-managers/agentic/autogen/`   |
 | **CrewAI**    | Python     | Streamlit Web UI  | `job-seekers-reach-out-to-hiring-managers/agentic/crewai/`    |
 | **LangGraph** | TypeScript | CLI (Interactive) | `job-seekers-reach-out-to-hiring-managers/agentic/langGraph/` |
-| **Mastra**    | TypeScript | CLI (Interactive) | `job-seekers-reach-out-to-hiring-managers/agentic/mastra/`    |
+| **Mastra**    | TypeScript | MASTRA UI         | `job-seekers-reach-out-to-hiring-managers/agentic/mastra/`    |
 
 ### Extract Premium Users from Groups
 
@@ -79,6 +84,17 @@ Each use case is implemented across multiple agent frameworks, allowing you to c
 ---
 
 ## 📊 Platform Comparison
+
+### AutoGen
+
+- **Language**: Python
+- **Interface**: Streamlit Web UI
+- **Best For**: Python developers, modular codebases, extensible agents
+- **Strengths**:
+  - Clean separation of concerns
+  - Modular architecture
+  - Easy to extend
+  - Single assistant agent pattern
 
 ### CrewAI
 
@@ -116,12 +132,13 @@ Each use case is implemented across multiple agent frameworks, allowing you to c
 ### Agno
 
 - **Language**: Python
-- **Interface**: Streamlit Web UI
-- **Best For**: Python developers, workflow-based systems
+- **Interface**: Streamlit Web UI + CLI
+- **Best For**: Python developers, natural language interfaces
 - **Strengths**:
-  - Workflow configuration
-  - Python-native
-  - Web interface
+  - Natural language interface
+  - CLI and Streamlit modes
+  - Intuitive tool selection
+  - Simple API
 
 ### MCP (Model Context Protocol)
 
@@ -187,17 +204,20 @@ cd job-seekers-reach-out-to-hiring-managers/agentic/crewai
 agentic-framework-examples/
 ├── job-seekers-reach-out-to-hiring-managers/
 │   └── agentic/
-│       ├── crewai/          # CrewAI implementation
+│       ├── README.md         # Use case overview and framework comparison
+│       ├── autogen/          # AutoGen implementation
+│       ├── crewai/           # CrewAI implementation
 │       ├── langGraph/        # LangGraph implementation
 │       └── mastra/           # Mastra implementation
 │
 ├── extract-linkedin-premium-users-from-linkedin-groups/
 │   ├── agentic/
-│   │   ├── crewai/          # CrewAI implementation
-│   │   ├── langGraph/       # LangGraph implementation
-│   │   ├── mastra/          # Mastra implementation
-│   │   └── agno/            # Agno implementation
-│   └── mcp/                 # MCP Server implementation
+│   │   ├── README.md         # Use case overview and framework comparison
+│   │   ├── agno/             # Agno implementation
+│   │   ├── crewai/           # CrewAI implementation
+│   │   ├── langGraph/        # LangGraph implementation
+│   │   └── mastra/           # Mastra implementation
+│   └── mcp/                  # MCP Server implementation
 │
 ├── LICENSE
 └── README.md (this file)
@@ -216,9 +236,11 @@ Each implementation includes:
 
 ### Recommended Learning Path
 
-1. **Start with CrewAI** (Python, Web UI) - Easiest to get started
-2. **Try LangGraph** (TypeScript, CLI) - Learn stateful workflows
-3. **Explore Mastra** (TypeScript, CLI) - Simple agent setup
+1. **Read the use case READMEs** - Understand the product and its importance:
+   - [Job Seekers Use Case](job-seekers-reach-out-to-hiring-managers/agentic/README.md)
+   - [Premium Members Use Case](extract-linkedin-premium-users-from-linkedin-groups/agentic/README.md)
+2. **Start with a Python framework** (AutoGen, CrewAI, or Agno) - Web UI, easier to get started
+3. **Try a TypeScript framework** (LangGraph or Mastra) - Learn CLI-based workflows
 4. **Compare approaches** - See how different frameworks solve the same problem
 
 ---
@@ -252,10 +274,19 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📚 Additional Resources
 
+### Framework Documentation
+
+- [AutoGen Documentation](https://microsoft.github.io/autogen/)
 - [CrewAI Documentation](https://docs.crewai.com)
 - [LangGraph Documentation](https://langchain-ai.github.io/langgraph/)
 - [Mastra Documentation](https://mastra.ai/docs)
-- [ConnectSafely.ai API Docs](https://connectsafely.ai/docs)
+- [Agno Documentation](https://github.com/agno-ai/agno)
+
+### ConnectSafely.ai
+
+- [ConnectSafely.ai Website](https://connectsafely.ai)
+- [ConnectSafely.ai API Documentation](https://connectsafely.ai/docs)
+- [ConnectSafely.ai Dashboard](https://connectsafely.ai/dashboard)
 
 ---
 
