@@ -1,7 +1,8 @@
 """Agent Factory - Creates and configures the AutoGen assistant agent."""
 
 from autogen_agentchat.agents import AssistantAgent
-from autogen_ext.models.google import GoogleGenAIChatCompletionClient
+from autogen_ext.models.openai import OpenAIChatCompletionClient
+from autogen_core.models import ModelInfo
 
 
 SYSTEM_PROMPT = """You are a LinkedIn Export Assistant that helps users search for LinkedIn profiles and export results to Google Sheets or JSON files.
@@ -42,9 +43,17 @@ def create_assistant_agent(api_key: str, model: str, tools: list) -> AssistantAg
     Returns:
         Configured AssistantAgent instance
     """
-    model_client = GoogleGenAIChatCompletionClient(
+    model_client = OpenAIChatCompletionClient(
         model=model,
         api_key=api_key,
+        base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+        model_info=ModelInfo(
+            vision=False,
+            function_calling=True,
+            json_output=False,
+            family="gemini",
+            structured_output=False,
+        ),
     )
 
     agent = AssistantAgent(

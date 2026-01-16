@@ -8,10 +8,10 @@
     "linkedin-premium-extractor": "./dist/agent.js"
   },
   "scripts": {
-    "dev": "mastra dev",
+    "dev": "mastra dev --dir .",
     "build": "tsc && chmod +x dist/agent.js",
-    "start": "node dist/agent.js",
-    "cli": "node dist/agent.js",
+    "start": "bun run agent.ts",
+    "cli": "bun run agent.ts",
     "prepublishOnly": "npm run build"
   },
   "keywords": ["linkedin", "agent", "premium-members"],

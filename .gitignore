@@ -9,3 +9,5 @@ mastra.db-wal
 .venv
 __pycache__/
 *.pyc
+bun.lock
+uv.lock
