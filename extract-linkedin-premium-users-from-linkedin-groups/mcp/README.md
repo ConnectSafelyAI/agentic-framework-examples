@@ -88,12 +88,6 @@ ConnectSafely.ai offers these capabilities through their **MCP (Model Context Pr
    GOOGLE_REFRESH_TOKEN=your_google_refresh_token
    ```
 
-4. **Build the project:**
-
-   ```bash
-   bun run build
-   ```
-
 ---
 
 ## 🎯 Usage
@@ -143,10 +137,10 @@ Execute a single command and exit:
 bun start -- "Get 10 premium members from group 9357376"
 ```
 
-Or with the compiled version:
+Or run directly:
 
 ```bash
-node dist/index.js "Search for posts about TypeScript"
+bun run src/index.ts "Search for posts about TypeScript"
 ```
 
 ### List Available Tools
@@ -278,7 +272,6 @@ mcp/
 │   │       ├── google-sheet.ts                      # Google Sheets tool
 │   │       └── index.ts                            # Tool export
 │   └── index.ts                                      # CLI entry point
-├── dist/                                             # Compiled JavaScript
 ├── package.json                                      # Dependencies and scripts
 ├── tsconfig.json                                     # TypeScript configuration
 ├── .env                                              # Environment variables (create this)

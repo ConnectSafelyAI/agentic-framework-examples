@@ -4,9 +4,36 @@ A comprehensive collection of AI agent implementations demonstrating the same us
 
 ## 🎯 Use Cases
 
-This repository contains two main use cases, each implemented across multiple agent frameworks. Each use case has a comprehensive README in its `agentic/` folder explaining the product, its importance, and framework comparisons.
+This repository contains three main use cases, each implemented across multiple agent frameworks. Each use case has a comprehensive README in its `agentic/` folder explaining the product, its importance, and framework comparisons.
 
-### 1. Job Seekers Reach Out to Hiring Managers
+### 1. LinkedIn Search → Google Sheets Export
+
+**Purpose**: Automate LinkedIn profile searching and export results directly to Google Sheets or JSON files for lead generation and data analysis.
+
+**Capabilities**:
+
+- Search for LinkedIn profiles by keywords, location, and job title
+- Export results directly to Google Sheets with automatic duplicate detection
+- Export to JSON files for local storage
+- Maintain context between commands for seamless workflows
+- **OAuth-based Google Sheets integration** - Modern authentication (no service account needed)
+- **Modular code architecture** - Clean, maintainable code structure with files under 100 lines
+
+**Use Cases**:
+
+- **Lead Generation**: Build prospect lists for sales outreach campaigns
+- **Recruiting**: Create candidate pipelines by searching for specific skills
+- **Market Research**: Analyze professional demographics across industries
+- **Competitive Intelligence**: Track hiring patterns and team composition
+- **Event Marketing**: Build invite lists for webinars and conferences
+
+**Location**: [`linkedin-to-sheets-export/agentic/`](linkedin-to-sheets-export/agentic/)
+
+📖 **[Read the full use case documentation →](linkedin-to-sheets-export/agentic/README.md)**
+
+---
+
+### 2. Job Seekers Reach Out to Hiring Managers
 
 **Purpose**: Automate the job search process and help job seekers connect with hiring managers on LinkedIn.
 
@@ -32,7 +59,7 @@ This repository contains two main use cases, each implemented across multiple ag
 
 ---
 
-### 2. Extract LinkedIn Premium Users from LinkedIn Groups
+### 3. Extract LinkedIn Premium Users from LinkedIn Groups
 
 **Purpose**: Extract and filter high-value LinkedIn group members (Premium and Verified users) for lead generation.
 
@@ -61,6 +88,15 @@ This repository contains two main use cases, each implemented across multiple ag
 ## 🚀 Available Platforms
 
 Each use case is implemented across multiple agent frameworks, allowing you to compare approaches and choose the best fit for your needs.
+
+### LinkedIn to Sheets Export
+
+| Platform      | Language   | Interface         | Location                                          |
+| ------------- | ---------- | ----------------- | ------------------------------------------------- |
+| **AutoGen**   | Python     | Streamlit Web UI  | `linkedin-to-sheets-export/agentic/autogen/`      |
+| **CrewAI**    | Python     | Streamlit Web UI  | `linkedin-to-sheets-export/agentic/crewai/`       |
+| **LangGraph** | TypeScript | CLI (Interactive) | `linkedin-to-sheets-export/agentic/langGraph/`    |
+| **Mastra**    | TypeScript | Mastra UI         | `linkedin-to-sheets-export/agentic/mastra/`       |
 
 ### Job Seekers → Hiring Managers
 
@@ -179,7 +215,10 @@ All implementations require a `CONNECTSAFELY_API_TOKEN`. Get yours from the [Con
 - **API Keys**:
   - `CONNECTSAFELY_API_TOKEN` (required for all)
   - `GEMINI_API_KEY` (for AI agents)
-  - `GOOGLE_SHEETS_CREDENTIALS` (for Google Sheets export, if applicable)
+  - Google OAuth credentials (for Google Sheets export, if applicable):
+    - `GOOGLE_CLIENT_ID`
+    - `GOOGLE_CLIENT_SECRET`
+    - `GOOGLE_REFRESH_TOKEN`
 
 ### Getting Started
 
@@ -202,6 +241,16 @@ cd job-seekers-reach-out-to-hiring-managers/agentic/crewai
 
 ```
 agentic-framework-examples/
+├── linkedin-to-sheets-export/
+│   ├── agentic/
+│   │   ├── README.md         # Use case overview and framework comparison
+│   │   ├── autogen/          # AutoGen implementation
+│   │   ├── crewai/           # CrewAI implementation
+│   │   ├── langGraph/        # LangGraph implementation
+│   │   └── mastra/           # Mastra implementation
+│   ├── content/              # Article content for different platforms
+│   └── README.md             # Project overview
+│
 ├── job-seekers-reach-out-to-hiring-managers/
 │   └── agentic/
 │       ├── README.md         # Use case overview and framework comparison
@@ -237,6 +286,7 @@ Each implementation includes:
 ### Recommended Learning Path
 
 1. **Read the use case READMEs** - Understand the product and its importance:
+   - [LinkedIn to Sheets Export Use Case](linkedin-to-sheets-export/agentic/README.md)
    - [Job Seekers Use Case](job-seekers-reach-out-to-hiring-managers/agentic/README.md)
    - [Premium Members Use Case](extract-linkedin-premium-users-from-linkedin-groups/agentic/README.md)
 2. **Start with a Python framework** (AutoGen, CrewAI, or Agno) - Web UI, easier to get started
