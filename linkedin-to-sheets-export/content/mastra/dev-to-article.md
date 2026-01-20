@@ -34,7 +34,7 @@ Mastra's advantages:
 - [Bun](https://bun.sh/) runtime
 - ConnectSafely.ai API token
 - Google Gemini API key
-- Google Sheets credentials (optional)
+- Google OAuth credentials (optional, for Sheets export)
 
 ## Project Structure
 
@@ -50,8 +50,12 @@ mastra/
     ├── index.ts          # Tool exports
     ├── types.ts          # TypeScript types
     ├── search-people.ts
-    ├── export-to-sheets.ts
-    └── export-to-json.ts
+    ├── export-to-json.ts
+    └── googleSheet/      # Google Sheets export module
+        ├── googleSheetsAuth.ts   # OAuth authentication
+        ├── googleSheetsClient.ts # Google Sheets API client
+        ├── schemas.ts            # Zod schemas & headers
+        └── export-to-sheets.ts   # Export tool
 ```
 
 ## Step 1: Setup
@@ -140,79 +144,60 @@ export const searchPeopleTool = createTool({
 
 ## Step 3: Export Tools
 
-```typescript
-// tools/export-to-sheets.ts
-import { createTool } from "@mastra/core/tools";
-import { z } from "zod";
-import { google } from "googleapis";
-import * as fs from "fs";
+The export tool is modularized into separate files:
 
-const personSchema = z.object({
-  profileUrl: z.string(),
-  fullName: z.string(),
-  headline: z.string(),
-  location: z.string(),
-});
+```typescript
+// tools/googleSheet/googleSheetsAuth.ts
+export async function getAccessToken(): Promise<string> {
+  const res = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      client_id: process.env.GOOGLE_CLIENT_ID!,
+      client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+      refresh_token: process.env.GOOGLE_REFRESH_TOKEN!,
+      grant_type: "refresh_token",
+    }),
+  });
+  const data = (await res.json()) as { access_token: string };
+  return data.access_token;
+}
+```
+
+```typescript
+// tools/googleSheet/googleSheetsClient.ts
+import { getAccessToken } from "./googleSheetsAuth.js";
+
+export class GoogleSheetsClient {
+  private baseUrl = "https://sheets.googleapis.com/v4/spreadsheets";
+
+  async createSpreadsheet(title: string, sheetName: string, headers: string[]) {
+    const accessToken = await getAccessToken();
+    // Creates spreadsheet and adds headers
+  }
+
+  async appendRows(spreadsheetId: string, sheetName: string, rows: any[][]) {
+    const accessToken = await getAccessToken();
+    // Appends rows to spreadsheet
+  }
+}
+```
+
+```typescript
+// tools/googleSheet/export-to-sheets.ts
+import { createTool } from "@mastra/core/tools";
+import { GoogleSheetsClient } from "./googleSheetsClient.js";
+import { inputSchema, outputSchema, HEADERS } from "./schemas.js";
 
 export const exportToSheetsTool = createTool({
   id: "export-to-sheets",
-  description: "Export LinkedIn profiles to Google Sheets",
-
-  inputSchema: z.object({
-    people: z.array(personSchema),
-    spreadsheetId: z.string().optional(),
-    sheetName: z.string().default("Sheet1"),
-  }),
-
-  outputSchema: z.object({
-    success: z.boolean(),
-    rowsExported: z.number().optional(),
-    spreadsheetUrl: z.string().optional(),
-    error: z.string().optional(),
-  }),
-
+  description: "Export LinkedIn search results to Google Sheets. Automatically creates or updates spreadsheet with duplicate detection by Profile ID.",
+  inputSchema,
+  outputSchema,
   execute: async ({ context }) => {
-    const { people, spreadsheetId, sheetName } = context;
-
-    const credsFile = process.env.GOOGLE_SHEETS_CREDENTIALS_FILE;
-    const sheetId = spreadsheetId || process.env.GOOGLE_SHEETS_SPREADSHEET_ID;
-
-    if (!credsFile || !fs.existsSync(credsFile)) {
-      return { success: false, error: "Credentials not found" };
-    }
-
-    try {
-      const auth = new google.auth.GoogleAuth({
-        keyFile: credsFile,
-        scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-      });
-
-      const sheets = google.sheets({ version: "v4", auth });
-
-      const timestamp = new Date().toISOString();
-      const rows = people.map((p) => [
-        p.profileUrl,
-        p.fullName,
-        p.headline,
-        p.location,
-        timestamp,
-      ]);
-
-      await sheets.spreadsheets.values.append({
-        spreadsheetId: sheetId,
-        range: `${sheetName}!A:E`,
-        valueInputOption: "USER_ENTERED",
-        requestBody: { values: rows },
-      });
-
-      return {
-        success: true,
-        rowsExported: rows.length,
-        spreadsheetUrl: `https://docs.google.com/spreadsheets/d/${sheetId}`,
-      };
-    } catch (error) {
-      return { success: false, error: String(error) };
-    }
+    const client = new GoogleSheetsClient();
+    // Uses OAuth authentication
+    // Handles spreadsheet creation and duplicate detection
   },
 });
 ```
@@ -232,6 +217,7 @@ import {
   exportToSheetsTool,
   exportToJsonTool,
 } from "../tools/index.js";
+// exportToSheetsTool is imported from tools/googleSheet/export-to-sheets.ts
 import { linkedInExportAgentInstructions } from "./instructions.js";
 
 export const linkedInExportAgent = new Agent({

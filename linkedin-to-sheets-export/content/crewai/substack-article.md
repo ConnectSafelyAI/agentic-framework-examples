@@ -146,47 +146,21 @@ def format_profile(p):
 ## Step 3: Export Tools
 
 ```python
+# tools/googlesheet/export_to_sheets.py
 @tool("Export to Google Sheets")
-def export_to_sheets(people: list, spreadsheet_id: str = None) -> dict:
-    """
-    Export profiles to Google Sheets.
-
-    Args:
-        people: List of profile dictionaries from search results
-        spreadsheet_id: Google Sheets ID (uses default if not provided)
-
-    Returns:
-        Success status and spreadsheet URL
-    """
-    import gspread
-    from google.oauth2.service_account import Credentials
-    from datetime import datetime
-
-    creds_file = os.getenv("GOOGLE_SHEETS_CREDENTIALS_FILE")
-    sheet_id = spreadsheet_id or os.getenv("GOOGLE_SHEETS_SPREADSHEET_ID")
-
-    credentials = Credentials.from_service_account_file(
-        creds_file,
-        scopes=["https://www.googleapis.com/auth/spreadsheets"]
-    )
-    client = gspread.authorize(credentials)
-    worksheet = client.open_by_key(sheet_id).sheet1
-
-    # Add headers if empty
-    if not worksheet.row_values(1):
-        worksheet.append_row(["profileUrl", "fullName", "headline", "location", "extractedAt"])
-
-    # Add data
-    timestamp = datetime.now().isoformat()
-    rows = [[p["profileUrl"], p["fullName"], p["headline"], p["location"], timestamp]
-            for p in people]
-    worksheet.append_rows(rows)
-
-    return {
-        "success": True,
-        "rows_exported": len(rows),
-        "spreadsheet_url": f"https://docs.google.com/spreadsheets/d/{sheet_id}",
-    }
+def export_to_sheets(
+    people: list,
+    spreadsheet_id: str = None,
+    spreadsheet_title: str = None,
+    sheet_name: str = "LinkedIn People"
+) -> dict:
+    """Export profiles to Google Sheets using OAuth authentication."""
+    from .client import GoogleSheetsClient
+    
+    client = GoogleSheetsClient()
+    # Uses OAuth authentication (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN)
+    # Handles spreadsheet creation and duplicate detection
+    # Returns detailed export statistics
 
 
 @tool("Export to JSON")

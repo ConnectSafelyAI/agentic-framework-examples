@@ -60,7 +60,7 @@ Each framework implementation includes:
 
 - **ConnectSafely.ai API Token**: Get yours at [connectsafely.ai](https://connectsafely.ai)
 - **Google Gemini API Key**: Get yours at [Google AI Studio](https://aistudio.google.com/)
-- **Google Sheets API Credentials** (optional): For Sheets export functionality
+- **Google OAuth Credentials** (optional): For Sheets export functionality (Client ID, Client Secret, Refresh Token)
 
 ### Choose Your Implementation
 
@@ -73,7 +73,7 @@ Each framework implementation includes:
 2. **Choose a Framework**: Select based on your language preference and needs
 3. **Follow Setup Guide**: Each implementation has detailed setup instructions
 4. **Get API Keys**: Set up ConnectSafely.ai and Google Gemini API keys
-5. **Configure Sheets** (optional): Set up Google Sheets API for export
+5. **Configure Google Sheets** (optional): Set up Google OAuth credentials for Sheets export (see framework-specific READMEs for detailed setup)
 
 ## ConnectSafely.ai Integration
 

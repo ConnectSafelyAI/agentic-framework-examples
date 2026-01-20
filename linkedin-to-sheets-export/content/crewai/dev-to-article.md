@@ -46,7 +46,10 @@ crewai/
 │   └── agents.py       # Agent definition
 └── tools/
     ├── search_people_tool.py
-    ├── export_to_sheets_tool.py
+    └── googlesheet/                 # Google Sheets export module
+        ├── auth.py                  # OAuth authentication
+        ├── client.py                # Google Sheets API client
+        └── export_to_sheets.py      # Export tool
     └── export_to_json_tool.py
 ```
 
@@ -127,59 +130,61 @@ def search_people(
 
 ## Step 3: Export Tools
 
+The export tool is modularized into separate files:
+
 ```python
-# tools/export_to_sheets_tool.py
+# tools/googlesheet/auth.py
 import os
-import gspread
-from google.oauth2.service_account import Credentials
-from datetime import datetime
+import requests
+
+def get_access_token() -> str:
+    """Get Google OAuth access token from refresh token."""
+    response = requests.post(
+        "https://oauth2.googleapis.com/token",
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+        data={
+            "client_id": os.getenv("GOOGLE_CLIENT_ID"),
+            "client_secret": os.getenv("GOOGLE_CLIENT_SECRET"),
+            "refresh_token": os.getenv("GOOGLE_REFRESH_TOKEN"),
+            "grant_type": "refresh_token",
+        },
+    )
+    return response.json()["access_token"]
+```
+
+```python
+# tools/googlesheet/client.py
+import requests
+from .auth import get_access_token
+
+class GoogleSheetsClient:
+    """Wrapper for Google Sheets API operations."""
+    
+    def create_spreadsheet(self, title: str, sheet_name: str, headers: list):
+        # Creates spreadsheet with OAuth authentication
+        pass
+    
+    def append_data(self, spreadsheet_id: str, sheet_name: str, values: list):
+        # Appends rows using OAuth
+        pass
+```
+
+```python
+# tools/googlesheet/export_to_sheets.py
 from crewai.tools import tool
+from .client import GoogleSheetsClient
 
 @tool("Export to Google Sheets")
-def export_to_sheets(people: list, spreadsheet_id: str = None) -> dict:
-    """
-    Export LinkedIn profiles to Google Sheets.
-
-    Args:
-        people: List of profile dictionaries to export
-        spreadsheet_id: Google Sheets ID (uses default if not provided)
-
-    Returns:
-        Dictionary with success status and spreadsheet URL
-    """
-    creds_file = os.getenv("GOOGLE_SHEETS_CREDENTIALS_FILE")
-    sheet_id = spreadsheet_id or os.getenv("GOOGLE_SHEETS_SPREADSHEET_ID")
-
-    scopes = [
-        "https://www.googleapis.com/auth/spreadsheets",
-        "https://www.googleapis.com/auth/drive"
-    ]
-    credentials = Credentials.from_service_account_file(creds_file, scopes=scopes)
-    client = gspread.authorize(credentials)
-
-    spreadsheet = client.open_by_key(sheet_id)
-    worksheet = spreadsheet.sheet1
-
-    headers = ["profileUrl", "fullName", "headline", "location", "extractedAt"]
-    if not worksheet.row_values(1):
-        worksheet.append_row(headers)
-
-    timestamp = datetime.now().isoformat()
-    rows = [[
-        p.get("profileUrl", ""),
-        p.get("fullName", ""),
-        p.get("headline", ""),
-        p.get("location", ""),
-        timestamp
-    ] for p in people]
-
-    worksheet.append_rows(rows)
-
-    return {
-        "success": True,
-        "rows_exported": len(rows),
-        "spreadsheet_url": f"https://docs.google.com/spreadsheets/d/{sheet_id}"
-    }
+def export_to_sheets(
+    people: list,
+    spreadsheet_id: str = None,
+    spreadsheet_title: str = None,
+    sheet_name: str = "LinkedIn People"
+) -> dict:
+    """Export LinkedIn profiles to Google Sheets using OAuth authentication."""
+    client = GoogleSheetsClient()
+    # Uses OAuth authentication
+    # Handles spreadsheet creation and duplicate detection
 ```
 
 ## Step 4: Define the Agent
@@ -190,7 +195,7 @@ from crewai import Agent
 from langchain_google_genai import ChatGoogleGenerativeAI
 
 from tools.search_people_tool import search_people
-from tools.export_to_sheets_tool import export_to_sheets
+from tools.googlesheet.export_to_sheets import export_to_sheets
 from tools.export_to_json_tool import export_to_json
 
 def create_export_agent():

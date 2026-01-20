@@ -25,7 +25,7 @@ This implementation uses Microsoft's AutoGen framework with a modular architectu
 - [uv](https://docs.astral.sh/uv/) package manager
 - ConnectSafely.ai API token
 - Google Gemini API key
-- Google Sheets credentials (optional)
+- Google OAuth credentials (optional, for Sheets export)
 
 ### Installation
 
@@ -39,8 +39,10 @@ cp .env.example .env
 # Edit .env with your API keys
 # CONNECTSAFELY_API_TOKEN=your_token
 # GEMINI_API_KEY=your_key
-# GOOGLE_SHEETS_CREDENTIALS_FILE=/path/to/creds.json
-# GOOGLE_SHEETS_SPREADSHEET_ID=your_sheet_id
+# For Google Sheets export (optional):
+# GOOGLE_CLIENT_ID=your_oauth_client_id
+# GOOGLE_CLIENT_SECRET=your_oauth_client_secret
+# GOOGLE_REFRESH_TOKEN=your_refresh_token
 
 # Install dependencies
 uv sync
@@ -55,8 +57,37 @@ uv run streamlit run App.py
 | ------------------------------- | -------- | ------------------------------------ |
 | CONNECTSAFELY_API_TOKEN         | Yes      | ConnectSafely.ai API token           |
 | GEMINI_API_KEY                  | Yes      | Google Gemini API key                |
-| GOOGLE_SHEETS_CREDENTIALS_FILE  | No       | Path to service account JSON         |
-| GOOGLE_SHEETS_SPREADSHEET_ID    | No       | Default spreadsheet ID               |
+| GOOGLE_CLIENT_ID                | No       | Google OAuth client ID (for Sheets)  |
+| GOOGLE_CLIENT_SECRET            | No       | Google OAuth client secret           |
+| GOOGLE_REFRESH_TOKEN            | No       | Google OAuth refresh token           |
+
+### Google OAuth Setup (Optional - for Sheets Export)
+
+To enable Google Sheets export with OAuth authentication:
+
+1. **Create OAuth Credentials**:
+   - Go to [Google Cloud Console](https://console.cloud.google.com/)
+   - Create a new project or select existing one
+   - Enable Google Sheets API
+   - Go to "APIs & Services" > "Credentials"
+   - Click "Create Credentials" > "OAuth client ID"
+   - Choose "Desktop app" as application type
+   - Download the credentials JSON
+
+2. **Get Refresh Token**:
+   - Use the OAuth client ID and secret to generate a refresh token
+   - You can use tools like [Google OAuth Playground](https://developers.google.com/oauthplayground/)
+   - Required scopes:
+     - `https://www.googleapis.com/auth/spreadsheets`
+     - `https://www.googleapis.com/auth/drive`
+
+3. **Set Environment Variables**:
+   - Add to your `.env` file:
+     ```
+     GOOGLE_CLIENT_ID=your_client_id
+     GOOGLE_CLIENT_SECRET=your_client_secret
+     GOOGLE_REFRESH_TOKEN=your_refresh_token
+     ```
 
 ## How to Use
 
@@ -107,8 +138,11 @@ autogen/
 │   ├── __init__.py
 │   ├── search_geo_location_tool.py  # Location search
 │   ├── search_people_tool.py        # People search
-│   ├── export_to_sheets_tool.py     # Sheets export
-│   └── export_to_json_tool.py       # JSON export
+│   ├── export_to_json_tool.py       # JSON export
+│   └── googlesheet/                 # Google Sheets export module
+│       ├── auth.py                  # OAuth authentication
+│       ├── client.py                # Google Sheets API client
+│       └── export_to_sheets.py      # Export function
 └── assets/
 ```
 
@@ -139,15 +173,16 @@ result = search_people(
 
 ### export_to_sheets
 
-Exports results to Google Sheets.
+Exports results to Google Sheets using OAuth authentication.
 
 ```python
 result = export_to_sheets(
     people=search_results["people"],
-    spreadsheet_id="1abc123xyz",
-    sheet_name="Sheet1"
+    spreadsheet_id="1abc123xyz",  # Optional: creates new if not provided
+    spreadsheet_title="My Leads",  # Optional: auto-generated if not provided
+    sheet_name="LinkedIn People"
 )
-# Returns: { "success": true, "rows_exported": 50, "spreadsheet_url": "..." }
+# Returns: { "success": true, "people_added": 50, "spreadsheet_url": "...", "people_skipped": 0 }
 ```
 
 ### export_to_json
@@ -196,9 +231,9 @@ result = export_to_json(
 - This resets the agent's memory
 
 **Google Sheets export fails**
-- Verify service account JSON path is correct
-- Ensure spreadsheet is shared with service account email
-- Check that the spreadsheet ID is correct
+- Verify OAuth credentials are set correctly in .env
+- Ensure GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GOOGLE_REFRESH_TOKEN are valid
+- Check that refresh token hasn't expired
 
 **No results found**
 - Try broader search terms

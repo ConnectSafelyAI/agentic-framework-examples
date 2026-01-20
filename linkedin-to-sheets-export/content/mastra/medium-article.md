@@ -169,8 +169,12 @@ mastra/
 └── tools/
     ├── index.ts
     ├── search-people.ts
-    ├── export-to-sheets.ts
-    └── export-to-json.ts
+    ├── export-to-json.ts
+    └── googleSheet/      # Google Sheets export module
+        ├── googleSheetsAuth.ts
+        ├── googleSheetsClient.ts
+        ├── schemas.ts
+        └── export-to-sheets.ts
 ```
 
 ### The Search Tool
@@ -231,35 +235,19 @@ export const searchPeopleTool = createTool({
 
 ### The Export Tool
 
+The export tool is modularized into separate files for OAuth authentication and Google Sheets API operations:
+
 ```typescript
+// tools/googleSheet/export-to-sheets.ts
+import { createTool } from "@mastra/core/tools";
+import { GoogleSheetsClient } from "./googleSheetsClient.js";
+
 export const exportToSheetsTool = createTool({
   id: "export-to-sheets",
-  description: "Export profiles to Google Sheets",
-
-  inputSchema: z.object({
-    people: z.array(personSchema),
-    spreadsheetId: z.string().optional(),
-  }),
-
-  outputSchema: z.object({
-    success: z.boolean(),
-    rowsExported: z.number().optional(),
-    spreadsheetUrl: z.string().optional(),
-    error: z.string().optional(),
-  }),
-
-  execute: async ({ context }) => {
-    const { people, spreadsheetId } = context;
-    const sheetId = spreadsheetId || process.env.GOOGLE_SHEETS_SPREADSHEET_ID;
-
-    // ... Google Sheets API code ...
-
-    return {
-      success: true,
-      rowsExported: people.length,
-      spreadsheetUrl: `https://docs.google.com/spreadsheets/d/${sheetId}`,
-    };
-  },
+  description: "Export LinkedIn search results to Google Sheets. Automatically creates or updates spreadsheet with duplicate detection by Profile ID.",
+  // Uses OAuth authentication via googleSheetsAuth.ts
+  // Handles API calls via googleSheetsClient.ts
+  // Includes duplicate detection and automatic spreadsheet creation
 });
 ```
 

@@ -55,7 +55,11 @@ langGraph/
     ├── index.ts          # Tool exports
     ├── types.ts          # TypeScript types
     ├── search-people.ts
-    ├── export-to-sheets.ts
+    └── googlesheet/            # Google Sheets export module
+        ├── auth.ts             # OAuth authentication
+        ├── client.ts           # Google Sheets API client
+        ├── schemas.ts          # Zod schemas & headers
+        └── export-to-sheets.ts # Export tool
     └── export-to-json.ts
 ```
 
@@ -164,68 +168,42 @@ function extractCompany(headline: string): string {
 
 ## Step 4: Export Tools
 
-```typescript
-// tools/export-to-sheets.ts
-import { tool } from "@langchain/core/tools";
-import { z } from "zod";
-import { google } from "googleapis";
-import * as fs from "fs";
+The export tool is modularized into separate files:
 
-const personSchema = z.object({
-  profileUrl: z.string(),
-  fullName: z.string(),
-  headline: z.string(),
-  location: z.string(),
-  company: z.string(),
-});
+```typescript
+// tools/googlesheet/auth.ts
+export async function getAccessToken(): Promise<string> {
+  const res = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      client_id: process.env.GOOGLE_CLIENT_ID!,
+      client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+      refresh_token: process.env.GOOGLE_REFRESH_TOKEN!,
+      grant_type: "refresh_token",
+    }),
+  });
+  const data = (await res.json()) as { access_token: string };
+  return data.access_token;
+}
+```
+
+```typescript
+// tools/googlesheet/export-to-sheets.ts
+import { tool } from "@langchain/core/tools";
+import { GoogleSheetsClient } from "./client.js";
+import { exportToSheetsSchema } from "./schemas.js";
 
 export const exportToSheetsTool = tool(
-  async ({ people, spreadsheetId, sheetName }) => {
-    const credsFile = process.env.GOOGLE_SHEETS_CREDENTIALS_FILE;
-    const sheetId = spreadsheetId || process.env.GOOGLE_SHEETS_SPREADSHEET_ID;
-
-    if (!credsFile || !fs.existsSync(credsFile)) {
-      return JSON.stringify({ success: false, error: "Credentials not found" });
-    }
-
-    const auth = new google.auth.GoogleAuth({
-      keyFile: credsFile,
-      scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-    });
-
-    const sheets = google.sheets({ version: "v4", auth });
-
-    const timestamp = new Date().toISOString();
-    const rows = people.map((p) => [
-      p.profileUrl,
-      p.fullName,
-      p.headline,
-      p.company,
-      p.location,
-      timestamp,
-    ]);
-
-    await sheets.spreadsheets.values.append({
-      spreadsheetId: sheetId,
-      range: `${sheetName}!A:F`,
-      valueInputOption: "USER_ENTERED",
-      requestBody: { values: rows },
-    });
-
-    return JSON.stringify({
-      success: true,
-      rowsExported: rows.length,
-      spreadsheetUrl: `https://docs.google.com/spreadsheets/d/${sheetId}`,
-    });
+  async ({ people, spreadsheetId, spreadsheetTitle, sheetName }) => {
+    const client = new GoogleSheetsClient();
+    // Uses OAuth authentication
+    // Handles spreadsheet creation and duplicate detection
   },
   {
     name: "export-to-sheets",
-    description: "Export profiles to Google Sheets",
-    schema: z.object({
-      people: z.array(personSchema),
-      spreadsheetId: z.string().optional(),
-      sheetName: z.string().default("Sheet1"),
-    }),
+    description: "Export LinkedIn search results to Google Sheets. Automatically creates or updates spreadsheet with duplicate detection by Profile ID.",
+    schema: exportToSheetsSchema,
   }
 );
 ```

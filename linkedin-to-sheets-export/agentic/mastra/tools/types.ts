@@ -2,18 +2,18 @@
 export interface Person {
   profileUrl: string;
   profileId: string;
-  profileUrn: string;
+  profileUrn?: string;
   fullName: string;
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
   headline: string;
-  currentPosition: string;
+  currentPosition?: string;
   company: string;
   location: string;
-  connectionDegree: string;
-  isPremium: boolean;
-  isOpenToWork: boolean;
-  profilePicture: string;
+  connectionDegree?: string;
+  isPremium?: boolean;
+  isOpenToWork?: boolean;
+  profilePicture?: string;
 }
 
 // Geographic location
@@ -38,5 +38,28 @@ export interface ExportResult {
   rowsExported?: number;
   filePath?: string;
   spreadsheetUrl?: string;
+  error?: string;
+}
+
+export interface ApiPerson {
+  profileUrl?: string;
+  profileId?: string;
+  profileUrn?: string;
+  firstName?: string;
+  lastName?: string;
+  headline?: string;
+  currentPosition?: string;
+  location?: string;
+  connectionDegree?: string;
+  isPremium?: boolean;
+  isOpenToWork?: boolean;
+  profilePicture?: string;
+}
+
+export interface ApiResponse {
+  success?: boolean;
+  people?: ApiPerson[];
+  pagination?: Record<string, unknown>;
+  hasMore?: boolean;
   error?: string;
 }

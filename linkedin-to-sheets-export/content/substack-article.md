@@ -159,23 +159,17 @@ And the export tool:
 ```python
 def export_to_sheets(
     people: List[Dict],
-    spreadsheet_id: str,
-    sheet_name: str = "Sheet1"
+    spreadsheet_id: str = None,
+    spreadsheet_title: str = None,
+    sheet_name: str = "LinkedIn People"
 ) -> Dict[str, Any]:
-    """Export results to Google Sheets."""
-
-    # Connect to Sheets API
-    credentials = Credentials.from_service_account_file(CREDS_FILE)
-    client = gspread.authorize(credentials)
-    spreadsheet = client.open_by_key(spreadsheet_id)
-    worksheet = spreadsheet.worksheet(sheet_name)
-
-    # Prepare rows
-    rows = [[p["name"], p["title"], p["company"], p["location"]]
-            for p in people]
-
-    # Append to sheet
-    worksheet.append_rows(rows)
+    """Export results to Google Sheets using OAuth authentication."""
+    from .client import GoogleSheetsClient
+    
+    client = GoogleSheetsClient()
+    # Uses OAuth authentication via get_access_token()
+    # Handles spreadsheet creation and duplicate detection
+    # Automatically creates spreadsheet if ID not provided
 
     return {
         "success": True,
@@ -198,18 +192,17 @@ To enable Sheets export:
    - Search for "Google Sheets API"
    - Click Enable
 
-3. **Create a service account**
-   - Go to IAM & Admin → Service Accounts
-   - Create account and download JSON key
+3. **Create OAuth credentials**
+   - Go to APIs & Services → Credentials
+   - Create OAuth client ID (Desktop app type)
+   - Generate refresh token using OAuth Playground
+   - Required scopes: `https://www.googleapis.com/auth/spreadsheets`, `https://www.googleapis.com/auth/drive`
 
-4. **Share your spreadsheet**
-   - Open your target spreadsheet
-   - Share it with the service account email
-
-5. **Configure environment**
+4. **Configure environment**
    ```bash
-   GOOGLE_SHEETS_CREDENTIALS_FILE=/path/to/key.json
-   GOOGLE_SHEETS_SPREADSHEET_ID=your_spreadsheet_id
+   GOOGLE_CLIENT_ID=your_oauth_client_id
+   GOOGLE_CLIENT_SECRET=your_oauth_client_secret
+   GOOGLE_REFRESH_TOKEN=your_refresh_token
    ```
 
 ---

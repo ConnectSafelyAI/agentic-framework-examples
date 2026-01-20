@@ -60,7 +60,11 @@ autogen/
 │       └── response_processor.py
 ├── tools/
 │   ├── search_people_tool.py
-│   └── export_to_sheets_tool.py
+│   ├── export_to_json_tool.py
+│   └── googlesheet/                 # Google Sheets export module
+│       ├── auth.py                  # OAuth authentication
+│       ├── client.py                # Google Sheets API client
+│       └── export_to_sheets.py      # Export tool
 ```
 
 The Streamlit interface makes it accessible to non-technical users:

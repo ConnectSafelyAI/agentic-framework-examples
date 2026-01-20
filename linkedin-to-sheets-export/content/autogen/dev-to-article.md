@@ -51,7 +51,10 @@ autogen/
 │       └── response_processor.py
 └── tools/
     ├── search_people_tool.py
-    ├── export_to_sheets_tool.py
+    └── googlesheet/                 # Google Sheets export module
+        ├── auth.py                  # OAuth authentication
+        ├── client.py                # Google Sheets API client
+        └── export_to_sheets.py      # Export function
     └── export_to_json_tool.py
 ```
 
@@ -124,54 +127,42 @@ def format_people(people):
 
 ## Step 3: Create the Export Tool
 
+The export tool is modularized into separate files:
+
 ```python
-# tools/export_to_sheets_tool.py
+# tools/googlesheet/auth.py
 import os
-import gspread
-from google.oauth2.service_account import Credentials
-from datetime import datetime
+import requests
+
+def get_access_token() -> str:
+    """Get Google OAuth access token from refresh token."""
+    response = requests.post(
+        "https://oauth2.googleapis.com/token",
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+        data={
+            "client_id": os.getenv("GOOGLE_CLIENT_ID"),
+            "client_secret": os.getenv("GOOGLE_CLIENT_SECRET"),
+            "refresh_token": os.getenv("GOOGLE_REFRESH_TOKEN"),
+            "grant_type": "refresh_token",
+        },
+    )
+    return response.json()["access_token"]
+```
+
+```python
+# tools/googlesheet/export_to_sheets.py
+from .client import GoogleSheetsClient
 
 def export_to_sheets(
     people: list,
     spreadsheet_id: str = None,
-    sheet_name: str = "Sheet1"
+    spreadsheet_title: str = None,
+    sheet_name: str = "LinkedIn People"
 ) -> dict:
-    """Export results to Google Sheets."""
-
-    creds_file = os.getenv("GOOGLE_SHEETS_CREDENTIALS_FILE")
-    sheet_id = spreadsheet_id or os.getenv("GOOGLE_SHEETS_SPREADSHEET_ID")
-
-    # Set up credentials
-    scopes = [
-        "https://www.googleapis.com/auth/spreadsheets",
-        "https://www.googleapis.com/auth/drive"
-    ]
-    credentials = Credentials.from_service_account_file(creds_file, scopes=scopes)
-    client = gspread.authorize(credentials)
-
-    # Open spreadsheet
-    spreadsheet = client.open_by_key(sheet_id)
-    worksheet = spreadsheet.worksheet(sheet_name)
-
-    # Add headers if needed
-    headers = ["profileUrl", "fullName", "headline", "company", "location", "extractedAt"]
-    if not worksheet.row_values(1):
-        worksheet.append_row(headers)
-
-    # Prepare and append rows
-    timestamp = datetime.now().isoformat()
-    rows = [[
-        p["profileUrl"], p["fullName"], p["headline"],
-        p["company"], p["location"], timestamp
-    ] for p in people]
-
-    worksheet.append_rows(rows)
-
-    return {
-        "success": True,
-        "rows_exported": len(rows),
-        "spreadsheet_url": f"https://docs.google.com/spreadsheets/d/{sheet_id}"
-    }
+    """Export results to Google Sheets using OAuth authentication."""
+    client = GoogleSheetsClient()
+    # Uses OAuth authentication
+    # Handles spreadsheet creation and duplicate detection
 ```
 
 ## Step 4: Build the Agent
@@ -357,7 +348,7 @@ def batch_search(searches: list) -> list:
 - Restart the application after changes
 
 **"Google Sheets credentials not found"**
-- Verify the path in `GOOGLE_SHEETS_CREDENTIALS_FILE`
+- Verify OAuth credentials: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN`
 - Ensure the JSON file exists
 
 **Slow responses**

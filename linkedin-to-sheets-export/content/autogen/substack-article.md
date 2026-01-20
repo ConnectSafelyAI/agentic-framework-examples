@@ -43,8 +43,7 @@ dependencies = [
     "autogen-agentchat>=0.7.0",
     "autogen-ext[google]>=0.4.0",
     "streamlit>=1.39.0",
-    "gspread>=6.0.0",
-    "google-auth>=2.25.0",
+    "requests>=2.32.0",
     "requests>=2.32.0",
     "python-dotenv>=1.0.0",
 ]
@@ -57,7 +56,9 @@ Create `.env`:
 ```bash
 CONNECTSAFELY_API_TOKEN=your_token_here
 GEMINI_API_KEY=your_key_here
-GOOGLE_SHEETS_CREDENTIALS_FILE=/path/to/creds.json
+GOOGLE_CLIENT_ID=your_oauth_client_id
+GOOGLE_CLIENT_SECRET=your_oauth_client_secret
+GOOGLE_REFRESH_TOKEN=your_refresh_token
 GOOGLE_SHEETS_SPREADSHEET_ID=your_sheet_id
 ```
 
@@ -133,58 +134,45 @@ def search_people(
 
 ### Step 4: The Export Tool
 
+The export tool is modularized into separate files:
+
 ```python
-# tools/export_to_sheets_tool.py
+# tools/googlesheet/auth.py
 import os
-import gspread
-from google.oauth2.service_account import Credentials
-from datetime import datetime
-from typing import Dict, Any, List
+import requests
+
+def get_access_token() -> str:
+    """Get Google OAuth access token from refresh token."""
+    response = requests.post(
+        "https://oauth2.googleapis.com/token",
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+        data={
+            "client_id": os.getenv("GOOGLE_CLIENT_ID"),
+            "client_secret": os.getenv("GOOGLE_CLIENT_SECRET"),
+            "refresh_token": os.getenv("GOOGLE_REFRESH_TOKEN"),
+            "grant_type": "refresh_token",
+        },
+    )
+    return response.json()["access_token"]
+```
+
+```python
+# tools/googlesheet/export_to_sheets.py
+from .client import GoogleSheetsClient
 
 def export_to_sheets(
     people: List[Dict[str, Any]],
     spreadsheet_id: str = None,
-    sheet_name: str = "Sheet1"
+    spreadsheet_title: str = None,
+    sheet_name: str = "LinkedIn People"
 ) -> Dict[str, Any]:
-    """
-    Export profiles to Google Sheets.
-
-    Args:
-        people: List of profile dicts
-        spreadsheet_id: Target sheet ID (or uses env default)
-        sheet_name: Tab name (default: Sheet1)
-
-    Returns:
-        Dict with success status and sheet URL
-    """
-    creds_file = os.getenv("GOOGLE_SHEETS_CREDENTIALS_FILE")
-    sheet_id = spreadsheet_id or os.getenv("GOOGLE_SHEETS_SPREADSHEET_ID")
-
-    # Auth
-    scopes = [
-        "https://www.googleapis.com/auth/spreadsheets",
-        "https://www.googleapis.com/auth/drive"
-    ]
-    credentials = Credentials.from_service_account_file(creds_file, scopes=scopes)
-    client = gspread.authorize(credentials)
-
-    # Open sheet
-    spreadsheet = client.open_by_key(sheet_id)
-
-    try:
-        worksheet = spreadsheet.worksheet(sheet_name)
-    except gspread.WorksheetNotFound:
-        worksheet = spreadsheet.add_worksheet(sheet_name, rows=1000, cols=10)
-
-    # Headers
-    headers = ["profileUrl", "fullName", "headline", "location", "extractedAt"]
-    if not worksheet.row_values(1):
-        worksheet.append_row(headers)
-
-    # Data
-    timestamp = datetime.now().isoformat()
-    rows = [[
-        p.get("profileUrl", ""),
+    """Export profiles to Google Sheets using OAuth authentication."""
+    from .client import GoogleSheetsClient
+    
+    client = GoogleSheetsClient()
+    # Uses OAuth authentication via get_access_token()
+    # Handles spreadsheet creation and duplicate detection
+    # Returns detailed export statistics
         p.get("fullName", ""),
         p.get("headline", ""),
         p.get("location", ""),
@@ -210,7 +198,7 @@ from autogen_agentchat.agents import AssistantAgent
 from autogen_ext.models.google import GoogleGenAI
 
 from tools.search_people_tool import search_people
-from tools.export_to_sheets_tool import export_to_sheets
+from tools.googlesheet.export_to_sheets import export_to_sheets
 from tools.export_to_json_tool import export_to_json
 
 SYSTEM_PROMPT = """You are a LinkedIn Export Assistant.

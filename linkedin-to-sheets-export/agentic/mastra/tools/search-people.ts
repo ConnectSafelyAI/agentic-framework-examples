@@ -1,31 +1,9 @@
 import { createTool } from "@mastra/core/tools";
 import { z } from "zod";
-import type { Person } from "./types.js";
+import type { ApiResponse } from "./types.js";
 
 const CONNECTSAFELY_API_TOKEN = process.env.CONNECTSAFELY_API_TOKEN || "";
 
-interface ApiPerson {
-  profileUrl?: string;
-  profileId?: string;
-  profileUrn?: string;
-  firstName?: string;
-  lastName?: string;
-  headline?: string;
-  currentPosition?: string;
-  location?: string;
-  connectionDegree?: string;
-  isPremium?: boolean;
-  isOpenToWork?: boolean;
-  profilePicture?: string;
-}
-
-interface ApiResponse {
-  success?: boolean;
-  people?: ApiPerson[];
-  pagination?: Record<string, unknown>;
-  hasMore?: boolean;
-  error?: string;
-}
 
 function extractCompany(headline: string): string {
   if (!headline) return "";

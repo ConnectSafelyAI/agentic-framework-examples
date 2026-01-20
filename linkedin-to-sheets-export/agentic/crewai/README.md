@@ -21,7 +21,7 @@ This implementation uses CrewAI's task-based agent framework with a Streamlit we
 - [uv](https://docs.astral.sh/uv/) package manager
 - ConnectSafely.ai API token
 - Google Gemini API key
-- Google Sheets credentials (optional)
+- Google OAuth credentials (optional, for Sheets export)
 
 ### Installation
 
@@ -35,8 +35,10 @@ cp .env.example .env
 # Edit .env with your API keys
 # CONNECTSAFELY_API_TOKEN=your_token
 # GEMINI_API_KEY=your_key
-# GOOGLE_SHEETS_CREDENTIALS_FILE=/path/to/creds.json
-# GOOGLE_SHEETS_SPREADSHEET_ID=your_sheet_id
+# For Google Sheets export (optional):
+# GOOGLE_CLIENT_ID=your_oauth_client_id
+# GOOGLE_CLIENT_SECRET=your_oauth_client_secret
+# GOOGLE_REFRESH_TOKEN=your_refresh_token
 
 # Install dependencies
 uv sync
@@ -51,8 +53,37 @@ uv run streamlit run App.py
 | ------------------------------- | -------- | ------------------------------------ |
 | CONNECTSAFELY_API_TOKEN         | Yes      | ConnectSafely.ai API token           |
 | GEMINI_API_KEY                  | Yes      | Google Gemini API key                |
-| GOOGLE_SHEETS_CREDENTIALS_FILE  | No       | Path to service account JSON         |
-| GOOGLE_SHEETS_SPREADSHEET_ID    | No       | Default spreadsheet ID               |
+| GOOGLE_CLIENT_ID                | No       | Google OAuth client ID (for Sheets)  |
+| GOOGLE_CLIENT_SECRET            | No       | Google OAuth client secret           |
+| GOOGLE_REFRESH_TOKEN            | No       | Google OAuth refresh token           |
+
+### Google OAuth Setup (Optional - for Sheets Export)
+
+To enable Google Sheets export with OAuth authentication:
+
+1. **Create OAuth Credentials**:
+   - Go to [Google Cloud Console](https://console.cloud.google.com/)
+   - Create a new project or select existing one
+   - Enable Google Sheets API
+   - Go to "APIs & Services" > "Credentials"
+   - Click "Create Credentials" > "OAuth client ID"
+   - Choose "Desktop app" as application type
+   - Download the credentials JSON
+
+2. **Get Refresh Token**:
+   - Use the OAuth client ID and secret to generate a refresh token
+   - You can use tools like [Google OAuth Playground](https://developers.google.com/oauthplayground/)
+   - Required scopes:
+     - `https://www.googleapis.com/auth/spreadsheets`
+     - `https://www.googleapis.com/auth/drive`
+
+3. **Set Environment Variables**:
+   - Add to your `.env` file:
+     ```
+     GOOGLE_CLIENT_ID=your_client_id
+     GOOGLE_CLIENT_SECRET=your_client_secret
+     GOOGLE_REFRESH_TOKEN=your_refresh_token
+     ```
 
 ## How to Use
 
@@ -96,8 +127,11 @@ crewai/
 │   ├── __init__.py
 │   ├── search_geo_location_tool.py  # Location search
 │   ├── search_people_tool.py        # People search
-│   ├── export_to_sheets_tool.py     # Sheets export
-│   └── export_to_json_tool.py       # JSON export
+│   ├── export_to_json_tool.py       # JSON export
+│   └── googlesheet/                 # Google Sheets export module
+│       ├── auth.py                  # OAuth authentication
+│       ├── client.py                # Google Sheets API client
+│       └── export_to_sheets.py      # Export tool
 └── assets/
 ```
 
@@ -133,9 +167,11 @@ def search_people(
 def export_to_sheets(
     people: List[Dict[str, Any]],
     spreadsheet_id: Optional[str] = None,
-    sheet_name: str = "Sheet1"
+    spreadsheet_title: Optional[str] = None,
+    sheet_name: str = "LinkedIn People"
 ) -> Dict[str, Any]:
-    """Export search results to Google Sheets."""
+    """Export search results to Google Sheets using OAuth authentication.
+    Automatically creates spreadsheet if ID not provided, with duplicate detection."""
 ```
 
 ### Export to JSON
@@ -187,9 +223,10 @@ agent = Agent(
 - Click "Clear History" in sidebar
 - Start with smaller searches (25-50 results)
 
-**Export fails with permission error**
-- Share spreadsheet with service account email
-- Verify credentials file path is correct
+**Export fails with authentication error**
+- Verify OAuth credentials are set correctly in .env
+- Ensure GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GOOGLE_REFRESH_TOKEN are valid
+- Check that refresh token hasn't expired
 
 ### Tips for Better Results
 

@@ -94,24 +94,22 @@ Simple, focused, testable. That's the AutoGen way.
 
 ## The Export Tool
 
-The Google Sheets export uses the `gspread` library:
+The Google Sheets export uses OAuth authentication and is modularized:
 
 ```python
-def export_to_sheets(people: list, spreadsheet_id: str) -> dict:
-    """Export profiles to Google Sheets."""
+# tools/googlesheet/export_to_sheets.py
+from .client import GoogleSheetsClient
 
-    # Authenticate
-    credentials = Credentials.from_service_account_file(CREDS_FILE)
-    client = gspread.authorize(credentials)
-
-    # Open sheet
-    sheet = client.open_by_key(spreadsheet_id)
-    worksheet = sheet.sheet1
-
-    # Prepare rows
-    rows = [[
-        p["fullName"],
-        p["headline"],
+def export_to_sheets(
+    people: list,
+    spreadsheet_id: str = None,
+    spreadsheet_title: str = None,
+    sheet_name: str = "LinkedIn People"
+) -> dict:
+    """Export profiles to Google Sheets using OAuth authentication."""
+    client = GoogleSheetsClient()
+    # Uses OAuth authentication (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN)
+    # Handles spreadsheet creation and duplicate detection
         p["company"],
         p["location"],
         p["profileUrl"]
@@ -274,7 +272,7 @@ uv run streamlit run App.py
 You'll need:
 - ConnectSafely.ai API token (free tier available)
 - Google Gemini API key
-- Google Sheets service account (for exports)
+- Google OAuth credentials (for exports)
 
 ---
 

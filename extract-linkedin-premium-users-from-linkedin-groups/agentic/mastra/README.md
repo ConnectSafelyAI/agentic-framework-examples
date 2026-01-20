@@ -194,7 +194,7 @@ The agent has access to 6 specialized tools:
 2. **Install dependencies**:
 
    ```bash
-   npm install
+   bun install
    ```
 
 3. **Configure environment variables**:
@@ -211,46 +211,22 @@ The agent has access to 6 specialized tools:
    GOOGLE_REFRESH_TOKEN=your_google_refresh_token
    ```
 
-### Building for Production
-
-Build the TypeScript code to JavaScript:
-
-```bash
-npm run build
-```
-
-This compiles all TypeScript files to the `dist/` directory.
-
 ---
 
 ## 🚀 Usage
 
-### Development Mode
-
-For development and testing:
-
-```bash
-# Interactive mode
-npx tsx agent.ts
-
-# Non-interactive mode (one command)
-npx tsx agent.ts "fetch 10 premium members from group 9357376"
-```
-
-### Production Mode
-
-After building:
+Run directly with Bun (no build step required):
 
 ```bash
 # Interactive mode (REPL)
-npm start
+bun run agent.ts
 # or
-./dist/agent.js
+bun start
 
 # Non-interactive mode (one command)
-npm start -- "fetch 10 premium members from group 9357376"
+bun run agent.ts "fetch 10 premium members from group 9357376"
 # or
-./dist/agent.js "fetch 10 premium members from group 9357376"
+bun start -- "fetch 10 premium members from group 9357376"
 ```
 
 ### Example Queries
@@ -533,7 +509,6 @@ extract-linkedin-premium-users-from-linkedin-groups/
         ├── tsconfig.json                 # TypeScript configuration
         ├── README.md                     # This file
         ├── .env                          # Environment variables (create this)
-        ├── dist/                         # Compiled JavaScript (after build)
         ├── index.ts                      # Mastra configuration
         ├── agents/
         │   └── linkedin-group-members-fetcher-agent.ts  # Agent definition
@@ -592,12 +567,12 @@ extract-linkedin-premium-users-from-linkedin-groups/
   - Ensure `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `GOOGLE_REFRESH_TOKEN` are all present
   - Check that your refresh token hasn't expired
 
-**Issue**: Build errors with module not found
+**Issue**: Module not found errors
 
 - **Solution**: 
   - Ensure all imports use `.js` extensions (even for `.ts` files)
-  - Run `npm run build` to compile TypeScript
-  - Check that `dist/` directory exists after build
+  - Run `bun install` to ensure all dependencies are installed
+  - Verify you're using Bun runtime (not Node.js)
 
 **Issue**: Agent doesn't understand my query
 

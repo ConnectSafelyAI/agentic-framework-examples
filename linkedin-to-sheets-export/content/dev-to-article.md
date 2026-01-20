@@ -238,14 +238,17 @@ const response = await fetch(
 
 1. Create a Google Cloud project
 2. Enable Google Sheets API
-3. Create a service account
-4. Download the JSON credentials
-5. Share your spreadsheet with the service account email
+3. Create OAuth credentials:
+   - Go to APIs & Services → Credentials
+   - Create OAuth client ID (Desktop app type)
+   - Generate refresh token using OAuth Playground
+   - Required scopes: `https://www.googleapis.com/auth/spreadsheets`, `https://www.googleapis.com/auth/drive`
 
 ```bash
 # .env
-GOOGLE_SHEETS_CREDENTIALS_FILE=/path/to/credentials.json
-GOOGLE_SHEETS_SPREADSHEET_ID=your_spreadsheet_id
+GOOGLE_CLIENT_ID=your_oauth_client_id
+GOOGLE_CLIENT_SECRET=your_oauth_client_secret
+GOOGLE_REFRESH_TOKEN=your_refresh_token
 ```
 
 ## Which Framework Should You Choose?

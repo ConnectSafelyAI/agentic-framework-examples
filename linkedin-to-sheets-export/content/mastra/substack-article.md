@@ -120,14 +120,12 @@ export const exportToSheetsTool = createTool({
 
   execute: async ({ context }) => {
     const { people, spreadsheetId } = context;
-    const sheetId = spreadsheetId || process.env.GOOGLE_SHEETS_SPREADSHEET_ID;
+    // Automatically creates spreadsheet if ID not provided
+    // Uses OAuth credentials: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN
 
-    const auth = new google.auth.GoogleAuth({
-      keyFile: process.env.GOOGLE_SHEETS_CREDENTIALS_FILE,
-      scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-    });
-
-    const sheets = google.sheets({ version: "v4", auth });
+    // Uses OAuth authentication via getAccessToken()
+    // Modular structure: googleSheetsAuth.ts handles token refresh
+    // googleSheetsClient.ts handles API operations
 
     const rows = people.map((p) => [
       p.profileUrl,

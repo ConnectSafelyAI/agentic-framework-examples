@@ -20,7 +20,7 @@ This implementation uses Mastra's agent orchestration framework with built-in me
 - [Bun](https://bun.sh/) runtime (v1.0+)
 - ConnectSafely.ai API token
 - Google Gemini API key
-- Google Sheets credentials (optional)
+- Google OAuth credentials (optional, for Sheets export)
 
 ### Installation
 
@@ -34,8 +34,10 @@ cp .env.example .env
 # Edit .env with your API keys
 # CONNECTSAFELY_API_TOKEN=your_token
 # GOOGLE_GENERATIVE_AI_API_KEY=your_key
-# GOOGLE_SHEETS_CREDENTIALS_FILE=/path/to/creds.json
-# GOOGLE_SHEETS_SPREADSHEET_ID=your_sheet_id
+# For Google Sheets export (optional):
+# GOOGLE_CLIENT_ID=your_oauth_client_id
+# GOOGLE_CLIENT_SECRET=your_oauth_client_secret
+# GOOGLE_REFRESH_TOKEN=your_refresh_token
 
 # Install dependencies
 bun install
@@ -52,8 +54,37 @@ This starts Mastra's development server with a web UI.
 | ------------------------------- | -------- | ------------------------------------ |
 | CONNECTSAFELY_API_TOKEN         | Yes      | ConnectSafely.ai API token           |
 | GOOGLE_GENERATIVE_AI_API_KEY    | Yes      | Google Gemini API key                |
-| GOOGLE_SHEETS_CREDENTIALS_FILE  | No       | Path to service account JSON         |
-| GOOGLE_SHEETS_SPREADSHEET_ID    | No       | Default spreadsheet ID               |
+| GOOGLE_CLIENT_ID                | No       | Google OAuth client ID (for Sheets)  |
+| GOOGLE_CLIENT_SECRET            | No       | Google OAuth client secret           |
+| GOOGLE_REFRESH_TOKEN            | No       | Google OAuth refresh token           |
+
+### Google OAuth Setup (Optional - for Sheets Export)
+
+To enable Google Sheets export with OAuth authentication:
+
+1. **Create OAuth Credentials**:
+   - Go to [Google Cloud Console](https://console.cloud.google.com/)
+   - Create a new project or select existing one
+   - Enable Google Sheets API
+   - Go to "APIs & Services" > "Credentials"
+   - Click "Create Credentials" > "OAuth client ID"
+   - Choose "Desktop app" as application type
+   - Download the credentials JSON
+
+2. **Get Refresh Token**:
+   - Use the OAuth client ID and secret to generate a refresh token
+   - You can use tools like [Google OAuth Playground](https://developers.google.com/oauthplayground/)
+   - Required scopes:
+     - `https://www.googleapis.com/auth/spreadsheets`
+     - `https://www.googleapis.com/auth/drive`
+
+3. **Set Environment Variables**:
+   - Add to your `.env` file:
+     ```
+     GOOGLE_CLIENT_ID=your_client_id
+     GOOGLE_CLIENT_SECRET=your_client_secret
+     GOOGLE_REFRESH_TOKEN=your_refresh_token
+     ```
 
 ## How to Use
 
@@ -94,8 +125,12 @@ mastra/
 │   ├── types.ts                  # TypeScript types
 │   ├── search-geo-location.ts    # Location search
 │   ├── search-people.ts          # People search
-│   ├── export-to-sheets.ts       # Sheets export
-│   └── export-to-json.ts         # JSON export
+│   ├── export-to-json.ts         # JSON export
+│   └── googleSheet/              # Google Sheets export module
+│       ├── googleSheetsAuth.ts   # OAuth authentication
+│       ├── googleSheetsClient.ts # Google Sheets API client
+│       ├── schemas.ts            # Zod schemas & headers
+│       └── export-to-sheets.ts   # Export tool
 └── assets/
 ```
 
@@ -187,19 +222,28 @@ export const searchPeopleTool = createTool({
 ```typescript
 export const exportToSheetsTool = createTool({
   id: "export-to-sheets",
-  description: "Export results to Google Sheets...",
+  description: "Export LinkedIn search results to Google Sheets. Automatically creates or updates spreadsheet with duplicate detection by Profile ID.",
   inputSchema: z.object({
     people: z.array(personSchema),
     spreadsheetId: z.string().optional(),
-    sheetName: z.string().default("Sheet1"),
+    spreadsheetTitle: z.string().optional(),
+    sheetName: z.string().default("LinkedIn People"),
   }),
   outputSchema: z.object({
     success: z.boolean(),
-    rowsExported: z.number().optional(),
-    spreadsheetUrl: z.string().optional(),
+    spreadsheetId: z.string(),
+    spreadsheetUrl: z.string(),
+    spreadsheetTitle: z.string(),
+    sheetName: z.string(),
+    peopleAdded: z.number(),
+    peopleSkipped: z.number(),
+    isNewSheet: z.boolean(),
+    summary: z.string(),
   }),
   execute: async ({ context }) => {
-    // Implementation
+    // Implementation using OAuth authentication
+    // Automatically creates spreadsheet if ID not provided
+    // Includes duplicate detection by Profile ID
   },
 });
 ```
@@ -257,9 +301,9 @@ This creates a `mastra.db` file in your project directory that persists conversa
 - Check the Mastra logs for detailed errors
 
 **Google Sheets export fails**
-- Ensure googleapis is installed: `bun add googleapis`
-- Verify service account credentials
-- Share spreadsheet with service account email
+- Verify OAuth credentials are set correctly in .env
+- Ensure GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GOOGLE_REFRESH_TOKEN are valid
+- Check that refresh token hasn't expired
 
 ### Viewing Logs
 
